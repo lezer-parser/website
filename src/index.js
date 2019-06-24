@@ -3,6 +3,7 @@ const markdown = require("markdown-it")({html: true}).use(require("markdown-it-d
 const {join} = require("path")
 const {readFileSync, readdirSync} = require("fs")
 const {mapDir} = require("./mapdir")
+const {buildRef} = require("./buildref")
 
 let base = join(__dirname, "..")
 
@@ -27,7 +28,9 @@ function loadTemplates(dir, env) {
 let mold = loadTemplates(join(base, "template"), {})
 
 mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
-  if (/\.md$/.test(name)) {
+  if (name == "docs/ref/index.html") {
+    return mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})
+  } else if (/\.md$/.test(name)) {
     let text = readFileSync(fullPath, "utf8")
     let meta = /^!(\{[^]*?\})\n\n/.exec(text)
     let data = meta ? JSON.parse(meta[1]) : {}

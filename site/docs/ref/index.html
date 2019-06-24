@@ -1,0 +1,14 @@
+<<head {title: "Lezer Reference Guide"}>>
+
+<h1>Lezer Reference Guide</h1>
+
+<<for mod $in.modules>>
+  <section id="<<t mod.name>>">
+    <h2><<t mod.name>></h2>
+    <dl>
+      <<h mod.content>>
+    </dl>
+  </section>
+<</for>>
+
+<<foot>>
