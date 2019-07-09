@@ -1,13 +1,20 @@
-<<head {title: "Lezer Reference Guide"}>>
+<<head {title: "Lezer Reference Manual", type: "docs"}>>
 
-<h1>Lezer Reference Guide</h1>
+<h1>Reference Manual</h1>
+
+<p>The lezer system consists of three modules, each distributed as a
+separate package on <a href="https://www.npmjs.com/">npm</a>.</p>
+
+<ul>
+  <li><a href="#lezer"><code>lezer</code></a>, the parser run-time</li>
+  <li><a href="#lezer-tree"><code>lezer-tree</code></a>, the data structure for representing syntax trees</li>
+  <li><a href="#lezer-generator"><code>lezer-generator</code></a>, the parser generator, an offline build tool to create parse tables from a grammar description</li>
+</ul>
 
 <<for mod $in.modules>>
-  <section id="<<t mod.name>>">
-    <h2>Module <<t mod.name>></h2>
-    <dl>
-      <<h mod.content>>
-    </dl>
+  <section id="<<t mod.shortName>>">
+    <h2><<t mod.name>> module</h2>
+    <<h mod.content>>
   </section>
 <</for>>
 

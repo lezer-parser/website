@@ -4,6 +4,7 @@ const {join, relative} = require("path")
 
 function Mod(name) {
   this.name = name
+  this.shortName = /\w+$/.exec(name)[0]
   let dir = require.resolve(name)
   this.base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
   this.main = join(join(this.base, "src"), name == "lezer-tree" ? "tree.ts" : "index.ts")
@@ -16,9 +17,10 @@ exports.buildRef = function buildRef() {
   return modules.map(mod => {
     let items = gather({filename: mod.main})
     return {
-      name: mod.name,
+      name: mod.shortName,
       content: build({
         name: mod.name,
+        shortName: mod.shortName,
         main: join(mod.main, "../README.md"),
         allowUnresolvedTypes: false,
         imports: [type => {

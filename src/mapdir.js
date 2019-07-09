@@ -1,5 +1,5 @@
 const {writeFileSync, mkdirSync, readdirSync, statSync, linkSync, renameSync, existsSync} = require("fs")
-const {join} = require("path")
+const {join, dirname} = require("path")
 const {sync: rimraf} = require("rimraf")
 
 exports.mapDir = function mapDir(source, dest, map, add = {}) {
@@ -16,8 +16,8 @@ exports.mapDir = function mapDir(source, dest, map, add = {}) {
         walkDir(path, prefixed)
       } else {
         let mapped = map(path, prefixed)
-        let outPath = join(temp, prefixed)
-        if (mapped) writeFileSync(outPath, mapped)
+        let outPath = join(temp, mapped && mapped.name ? mapped.name : prefixed)
+        if (mapped) writeFileSync(outPath, mapped.content)
         else if (mapped !== false) linkSync(path, outPath)
       }
     }

@@ -1,5 +1,5 @@
 const Mold = require("mold-template")
-const markdown = require("markdown-it")({html: true}).use(require("markdown-it-deflist"))
+const markdown = require("markdown-it")({html: true}).use(require("markdown-it-deflist")).use(require("markdown-it-anchor"))
 const {join} = require("path")
 const {readFileSync, readdirSync} = require("fs")
 const {mapDir} = require("./mapdir")
@@ -29,16 +29,17 @@ let mold = loadTemplates(join(base, "template"), {})
 
 mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
   if (name == "docs/ref/index.html") {
-    return mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})
+    return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})}
   } else if (/\.md$/.test(name)) {
     let text = readFileSync(fullPath, "utf8")
     let meta = /^!(\{[^]*?\})\n\n/.exec(text)
     let data = meta ? JSON.parse(meta[1]) : {}
     data.content = meta ? text.slice(meta[0].length) : text
     data.fileName = name
-    return mold.defs[data.template || "page"](data)
+    return {name: name.replace(/\.md$/, ".html"),
+            content: mold.defs[data.template || "page"](data)}
   } else if (/\.html$/.test(name)) {
-    return mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name})
+    return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name})}
   } else {
     return null
   }

@@ -1,4 +1,4 @@
-<<in {title, meta}>>
+<<in {title, meta, type}>>
 
 <!doctype html>
 <html lang=en-US>
@@ -11,5 +11,19 @@
 
 <title><<t title || "Lezer">></title>
 <link rel=stylesheet href=/css/site.css>
+
+<header>
+  <nav>
+    <a class=logo href="/">Lezer</a>
+    <div class=navlinks>
+      <a href="/docs/" <<if type == "docs">>class=active<</if>>>Documentation</a>
+      <a href="https://github.com/prosemirror">GitHub</a>
+    </div>
+  </nav>
+  <<if type == "frontpage">>
+    <h1>A toolkit for building rich-text editors on the web</h1>
+    <div id=editor></div>
+  <</if>>
+</header>
 
 <article>
