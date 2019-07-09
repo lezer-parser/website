@@ -23,6 +23,7 @@ exports.buildRef = function buildRef() {
         shortName: mod.shortName,
         main: join(mod.main, "../README.md"),
         allowUnresolvedTypes: false,
+        markdownFilter: exports.linkRef,
         imports: [type => {
           let sibling = type.typeSource && modules.find(m => type.typeSource.startsWith(m.relative))
           if (sibling) return "#" + sibling.name + "." + type.type
@@ -30,4 +31,8 @@ exports.buildRef = function buildRef() {
       }, items)
     }
   })
+}
+
+exports.linkRef = function linkRef(markdown) {
+  return markdown.replace(/\]\(#(#.*?)\)/g, "](/docs/ref/$1)")
 }

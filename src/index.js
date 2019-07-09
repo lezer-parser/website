@@ -3,7 +3,7 @@ const markdown = require("markdown-it")({html: true}).use(require("markdown-it-d
 const {join} = require("path")
 const {readFileSync, readdirSync} = require("fs")
 const {mapDir} = require("./mapdir")
-const {buildRef} = require("./buildref")
+const {buildRef, linkRef} = require("./buildref")
 
 let base = join(__dirname, "..")
 
@@ -15,7 +15,7 @@ function loadTemplates(dir, env) {
   }
   mold.defs.markdown = function(options) {
     if (typeof options == "string") options = {text: options}
-    return markdown.render(options.text)
+    return markdown.render(linkRef(options.text))
   }
   mold.defs.markdownFile = function(options) {
     if (typeof options == "string") options = {file: options}
