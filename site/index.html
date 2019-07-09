@@ -1,0 +1,94 @@
+<<head {
+  type: "frontpage",
+  title: "Lezer",
+  meta: {"og:title": "Lezer",
+         "og:type": "website",
+         "og:url": "http://lezer.codemirror.net/",
+         "og:image": "http://lezer.codemirror.net/css/logo.png",
+         "og:description": "Incremental parsing system"},
+}>>
+
+<h1>The Lezer Parser System</h1>
+
+<p>The problem of parsing structured text has resisted one-size-fits
+all solutions for over 60 years. Lezer isn't such a solution either,
+but it <em>is</em> a very decent parser generator, especially well
+suited for use in code editors.</p>
+
+<p>Lezer (the Dutch word for reader, pronounced like “laser”) provides
+a parser generator that outputs JavaScript modules, which can be
+loaded to parse code into a non-abstract syntax tree. This tree can
+then be used to do highlighting and basic semantic analysis.</p>
+
+<h2 class=hr id=features>Features</h2>
+
+<ul class=grid-list>
+  <li>
+    <h3>Grammar Driven</h3>
+    <p>Write your
+    grammars <a href="docs/guide/#writing-a-grammar">declaratively</a>,
+    use a parser generator tool to convert it into an efficient
+    parser.</p>
+  </li>
+  <li>
+    <h3>Incremental</h3>
+    <p>Lezer can quickly re-parse documents that were slightly changed
+    compared to a previously parsed version by reusing nodes from the
+    old parse.</p>
+  </li>
+  <li>
+    <h3>Error-Insensitive</h3>
+    <p>Being designed for the code editor use case, the parser is
+    equipped with strategies for recovering from syntax errors, and
+    can produce a tree for any input.</p>
+  </li>
+  <li>
+    <h3>Fast</h3>
+    <p>By using the LR parsing algorithm, an efficient tokenizer, and
+    data structures optimized for locality, the parser rips through
+    its input like an angry wolverine.</p>
+  </li>
+  <li>
+    <h3>Lightweight</h3>
+    <p>The parser generator produces compact parse table files which,
+    along with the run-time library, are all you need to ship to
+    clients.</p>
+  </li>
+  <li>
+    <h3>Memory-Friendly</h3>
+    <p>The syntax tree representation is designed to be compact,
+    packing groups of smaller nodes into arrays of 16-bit numbers.</p>
+  </li>
+</ul>
+
+<h2 class=hr id=grammars>Grammars</h2>
+
+<ul class=grid-list>
+  <li>
+    <a href="https://github.com/lezer-parser/javascript" class=blocklink>
+      <h3>JavaScript</h3>
+    </a>
+  </li>
+</ul>
+
+<h2 class=hr id=about>About</h2>
+
+<p>Lezer
+is <a href="https://github.com/lezer-parser/lezer/blob/master/LICENSE">open
+source</a> under an MIT license. It is maintained by
+the <a href="https://codemirror.net/">CodeMirror</a> team.</p>
+
+<p>Lezer is being developed
+on <a href="https://github.com/lezer-parser/">GitHub</a>.
+Contributions are welcome.
+
+<p>Discussing the project, or asking questions, is best done on
+the <a href="https://discuss.codemirror.net/c/lezer">forum</a>.
+Bugs should be reported through
+the <a href="https://github.com/lezer-parser/lezer/issues">issue
+tracker</a>. We aim to be an inclusive, welcoming community. To make
+that explicit, we have
+a <a href="http://contributor-covenant.org/version/1/1/0/">code of
+conduct</a> that applies to communication around the project.</p>
+
+<<foot>>
