@@ -35,9 +35,9 @@ position, and a flat sequence of children. When writing a grammar, you
 choose which productions are stored as nodes—the others don't appear
 in the tree at all.
 
-This means that the tree is very in memory and cheap to build. It does
-make doing refined analysis on it somewhat awkward. The use case
-guiding the design of this library is an [editor
+This means that the tree is very compact in memory and cheap to build.
+It does make doing refined analysis on it somewhat awkward. The use
+case guiding the design of this library is an [editor
 system](https://codemirror.net), which keeps a syntax tree of the
 edited document, and uses it for things like syntax highlighting and
 smart indentation.
