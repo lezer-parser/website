@@ -12,7 +12,7 @@
   "homepage": "https://lezer.codemirror.net/",
   "dependencies": {
     "builddocs": "git://github.com/marijnh/builddocs.git#v1",
-    "gettypes": "git://github.com/ardianheine/gettypes.git#type-data-rewrite",
+    "gettypes": "git://github.com/adrianheine/gettypes.git#type-data-rewrite",
     "lezer": "^0.1.0",
     "lezer-generator": "^0.1.0",
     "lezer-tree": "^0.1.0",
