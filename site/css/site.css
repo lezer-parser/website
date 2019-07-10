@@ -250,14 +250,15 @@ ul.grid-list h3 {
 @media screen and (max-width: 830px) {
   h1 { font-size: 22px }
   a.logo {
-    padding-left: 38px;
+    padding-left: 34px;
     letter-spacing: -1px;
-    background-size: 28px 28px;
-    background-position: top left;
+    background-size: 30px;
+    background-position: top 6px left;
     background-repeat: no-repeat;
     font-size: 24px;
     line-height: 30px;
   }
+  body { margin: 0 3px }
 }
 
 @media screen and (max-width: 1130px) {
