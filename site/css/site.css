@@ -55,7 +55,7 @@ h4 { font-size: 18px; line-height: 22px; margin: 25px 0 12px; }
 a { text-decoration: none }
 
 header {
-  padding: 62px 3px 0;
+  padding: 62px 10px 0;
 }
 
 header > h1 {
@@ -173,12 +173,12 @@ nav#toc ul ul {
 }
 
 article {
-  padding: 10px 3px 100px;
+  padding: 10px 10px 100px;
 }
 
 footer {
   margin-bottom: 54px;
-  padding: 14px 3px 0;
+  padding: 14px 10px 0;
 }
 
 h2.hr {
