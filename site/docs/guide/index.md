@@ -593,6 +593,10 @@ the rest, and it is okay to just tack it onto the end in that case.)
 Being meticulous about assigning tags can be a great help to users of
 your grammar's output. See the tag guide (FIXME) for some guidelines.
 
+You'll usually also want to assign a tag to your `@top` rule, which
+will determine the tag assigned to the whole tree produced by the
+grammar. If you don't, it will default to `document`.
+
 Parts that aren't plain ASCII words can be escaped with double quotes
 using JSON escaping rules. It is possible for a part to have a value,
 written `lang=javascript`.
@@ -633,23 +637,11 @@ explicitly add tags to them with a `@tags` block.
 Such a block can also assign tags to named terms, as with `string`
 above, if you prefer to specify all your tags in one place.
 
-If you want to add some parts to _all_ tags defined in your grammar,
-you can include an `@all<:my.tag>` declaration inside a `@tags` block.
-This is often used for a `lang=` tag, so that nodes from your grammar
-can be recognized as belonging to that grammar.
-
 Since it is often useful to add `.punctuation` tags to a bunch of
 single-character literals, and those tags are usually the same across
 grammars, lezer-generator has a shortcut where it accepts an
 `@punctuation` declaration inside `@tags` to quickly define these
 standard punctuation names.
-
-```
-@tags {
-  @all<:lang=xml>
-  @punctuation<"()[]{},">
-}
-```
 
 It can be useful for syntax tree consumers, especially when they are a
 text editor, to know when a node type is delimited by a fixed pair of
@@ -660,6 +652,13 @@ convention is to use a `delim="{ }"` tag part (where the value of
 will, for tagged rules that look like their definition contains
 matching delimiters (their first and last token contain mirrored
 bracket-type characters) automatically add a `delim` part.
+
+```
+@tags {
+  @punctuation<"()[]{},">
+  @detect-delim
+}
+```
 
 ### External Tokens
 
@@ -724,16 +723,14 @@ The value of a [nested grammar](##lezer.NestedGrammar) can be either
 a function (see the docs for its signature) that delays the decision
 on how to parse the content to run-time.
 
-You can pass up to three arguments to `nest.something` to further
+You can pass up to two arguments to `nest.something` to further
 specify the way the region should be parsed. The first argument may be
-a tag to assign to the node that wraps the nested region. The second
-may be an explicit end token. By default, the token occurring directly
-after the `nest` expression is taken as the token that ends the
-region, but sometimes that isn't what you want. Finally, a third
-argument may provide a default expression to parse, instead of
-entering the nested grammar, in case the nested grammar is a dynamic
-function and it returns `{stay: true}` (declines to enter the
-nesting).
+an explicit end token. By default, the token occurring directly after
+the `nest` expression is taken as the token that ends the region, but
+sometimes that isn't what you want. A second argument may provide a
+default expression to parse, instead of entering the nested grammar,
+in case the nested grammar is a dynamic function and it returns
+`{stay: true}` (declines to enter the nesting).
 
 ## Building a Grammar
 
