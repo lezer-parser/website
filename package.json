@@ -13,9 +13,9 @@
   "dependencies": {
     "builddocs": "git://github.com/marijnh/builddocs.git#v1",
     "gettypes": "git://github.com/adrianheine/gettypes.git#type-data-rewrite",
-    "lezer": "^0.2.0",
-    "lezer-generator": "^0.2.0",
-    "lezer-tree": "^0.2.0",
+    "lezer": "^0.3.0",
+    "lezer-generator": "^0.3.0",
+    "lezer-tree": "^0.3.0",
     "markdown-it": "^8.4.2",
     "markdown-it-anchor": "^5.2.4",
     "markdown-it-deflist": "^2.0.3",
