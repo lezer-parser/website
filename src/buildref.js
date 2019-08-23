@@ -20,7 +20,7 @@ exports.buildRef = function buildRef() {
       name: mod.shortName,
       content: build({
         name: mod.name,
-        shortName: mod.shortName,
+        anchorPrefix: mod.shortName + ".",
         main: join(mod.main, "../README.md"),
         allowUnresolvedTypes: false,
         markdownFilter: exports.linkRef,
