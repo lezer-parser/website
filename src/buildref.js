@@ -26,7 +26,7 @@ exports.buildRef = function buildRef() {
         markdownFilter: exports.linkRef,
         imports: [type => {
           let sibling = type.typeSource && modules.find(m => type.typeSource.startsWith(m.relative))
-          if (sibling) return "#" + sibling.name + "." + type.type
+          if (sibling) return "#" + sibling.shortName + "." + type.type
         }]
       }, items)
     }
