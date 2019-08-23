@@ -8,7 +8,7 @@ function Mod(name) {
   let dir = require.resolve(name)
   this.base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
   this.main = join(join(this.base, "src"), name == "lezer-tree" ? "tree.ts" : "index.ts")
-  this.relative = relative(process.cwd(), this.base)
+  this.relative = relative(process.cwd(), this.base) + "/"
 }
 
 exports.buildRef = function buildRef() {
