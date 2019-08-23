@@ -822,4 +822,87 @@ the [`accept` method](##lezer.Token.accept).
 
 ## Working with Trees
 
-FIXME To be added later
+Syntax trees produced by Lezer are stored in a format that's optimized
+for compactness and efficient reuse during incremental parsing. Using
+this structure directly for other purposes can be very awkard.
+
+Firstly, the trees contain nodes that don't correspond to named rules
+in the grammar, but indicate repetitions from `+` or `*` operators in
+the grammar. These are essential for incremental parsing, but usually
+uninteresting in any other context.
+
+Secondly, chunks of small nodes are compressed together in arrays of
+16-bit numbers, with each node only encoding its type id, start
+postion, end position, and the index at which its children end. This
+_is_ compact, but it is not a format you want to be directly
+interacting with.
+
+### Iteration
+
+The easiest thing you can do with a tree is to iterate over its (real,
+non-repeat) nodes. The [`iterate` method](##tree.Subtree.iterate) can
+do either a forward or a backward walk over a part of the tree,
+calling a function every time it enters a node, and, optionally,
+another every time it exits a node.
+
+These functions are passed the node type as well as its start and end
+positions. You can use this, possibly along with some local state
+tracking, to perform actions on the tree's content. For example, this
+would be a crude way to convert a tree to XML:
+
+```
+function treeToXML(tree) {
+  let xml = ""
+  tree.iterate(0, tree.length, (type, start, end) => {
+    // Open tag on entering a node
+    xml += `<node type="${type.name}" start="${start}" end="${end}">`
+  }, () => {
+    // Close tag on exit
+    xml += `</node>`
+  })
+  return xml
+}
+```
+
+Iteration will include all nodes that touch the given range, even when
+they end at its start or start at its end.
+
+The function called when entering a node has a somewhat complicated
+return protocol. By default, when it returns undefined, iteration
+proceeds as normal. When it returns the precise value `false`, that
+indicates that the node that's being entered should be skipped—no
+callbacks will be called for its children, and no leave callback will
+be called for the node itself.
+
+Finally, if they return any other value, the iteration is immediately
+stopped and that value is returned from `iterate`. This can be used
+for seach-like iteration, where you want to find a given node or check
+whether some type of node is present.
+
+```
+let hasBreakStatement = tree.iterate(0, tree.length, type => {
+  return type.name == "BreakStatement" ? true : undefined
+})
+```
+
+### Subtree Cursors
+
+To rummage through a tree in a less one-directional way, you can use
+the [`Subtree`](##tree.Subtree) abstraction. This is a representation
+of a given node in the tree, with awareness of its parents and
+absolute position. It allows you to zoom in on a given node, inspect
+it, continue to its children, or go back to its parent.
+
+The top-level tree you get from the parser implements the `Subtree`
+interface. From any subtree you can use the
+[`resolve`](##tree.Subtree.resolve) method to find the innermost node
+at a given position, returned as a `Subtree`.
+
+Each subtree has a [`parent`](##tree.Subtree.parent) pointer, which
+points at the subtree for its parent node (if any).
+
+To query direct children, subtrees have
+[`firstChild`](##tree.Subtree.firstChild),
+[`lastChild`](##tree.Subtree.lastChild),
+[`childBefore`](##tree.Subtree.childBefore), and
+[`childAfter`](##tree.Subtree.childAfter) properties.
