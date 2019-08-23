@@ -195,7 +195,7 @@ A grammar is a collection of _rules_, which define _terms_. Terms can
 be either tokens, in which case they directly match a piece of input
 text, or nonterminals, which match expressions made up of other
 terms. Both tokens and nonterminals are defined using similar syntax,
-but they are explicitly distinguished (tokens must appear in an
+but they are explicitly distinguished (tokens must appear in a
 `@tokens` block), and tokens are more limited in what they can
 match—for example, they can't contain arbitrary recursion.
 
@@ -210,13 +210,13 @@ Here is an example of a simple grammar:
 ```
 @top { expression }
 
-expression { name | number | binaryExpression }
+expression { Name | Number | BinaryExpression }
 
-binaryExpression:binary.expression { "(" expression ("+" | "-") expression ")" }
+BinaryExpression { "(" expression ("+" | "-") expression ")" }
 
 @tokens {
-  name:variable.expression { std.asciiLetter+ }
-  number:number.expression { std.digit+ }
+  Name { std.asciiLetter+ }
+  Number { std.digit+ }
 }
 ```
 
@@ -228,17 +228,21 @@ expressions are required, or it would complain about ambiguity.
 will be used to match the entire input. It'll usually contain
 something that repeats, like `statement+`.
 
-Some of the terms definitions in the example have a colon after the
-term name. These define a _tag_ for that term. By default, matched
-terms do not appear in the output tree. They only do when you define a
-tag for them.
+You'll notice that the example has some terms starting with lowercase
+letter, and some that are capitalized. This difference is significant.
+Capitalized rules will show up as nodes in the syntax tree produced by
+the parser, lower-case rules will not.
+
+(If you are writing rule names in a script that doesn't have case, you
+can use an underscore at the start of a name to indicate that the rule
+should not be in the tree.)
 
 ### Operators
 
 The grammar notation supports the repetition operators `*` (any number
 of repetitions of the thing before), `+` (one or more repetitions),
 and `?` (optional, zero or one repetitions). These have high
-precedence and only apply to the thing directly in front of them.
+precedence and only apply to the element directly in front of them.
 
 The pipe `|` character is used to represent choice, matching either of
 the expressions on its sides. It can, of course, be repeated to
@@ -260,7 +264,7 @@ other. `a b` means `a` followed by `b`.
 Named tokens are defined in a `@tokens` block. You can also, outside
 of the `tokens` block, use string literals like `"+"` as tokens. These
 automatically define a new token. String literals use the same
-escaping rules as in JavaScript.
+escaping rules as JavaScript strings.
 
 String literals inside of token rules work differently. They can be
 combined with other expressions to form a bigger token. All token
@@ -273,23 +277,23 @@ So an expression like `"a" "b" "c"` in a nonterminal rule is a
 sequence of three tokens. In a token rule, it is exactly equivalent to
 the string `"abc"`.
 
-You can express character sets using square bracket notation, in a way
-similar to square bracket notation in regular expression. `[.,]` means
-either a period or a comma (there's no special meaning associated with
-`.` in this notation, or with escapes like `\s`). `[a-z]` matches `a`,
-`z`, and any character that, in the Unicode character code ordering,
-comes between them. To create an inverted character set, matching only
-character not mentioned in the set, the first character after the
-opening bracket must be `^`. So `[^x]` matches any character that is
-not `x`.
+You can express character sets using set notation, somewhat similar to
+square bracket notation in regular expression. `$[.,]` means either a
+period or a comma (there's no special meaning associated with `.` in
+this notation, or with escapes like `\s`). `$[a-z]` matches `a`, `z`,
+and any character that, in the Unicode character code ordering, comes
+between them. To create an inverted character set, matching only
+character not mentioned in the set, you write an exclamation mark
+rather than a dollar sign before the brackets. So `![x]` matches any
+character that is not `x`.
 
 The parser generator defines a few built-in character sets under names
 that start with `std.`:
 
- - `std.asciiLetter` matches `[a-zA-Z]`
- - `std.asciiLowercase` matches `[a-z]`
- - `std.asciiUppercase` is equivalent to `[A-Z]`
- - `std.digit` matches `[0-9]`
+ - `std.asciiLetter` matches `$[a-zA-Z]`
+ - `std.asciiLowercase` matches `$[a-z]`
+ - `std.asciiUppercase` is equivalent to `$[A-Z]`
+ - `std.digit` matches `$[0-9]`
  - `std.whitespace` matches any character the Unicode standard defines
    as whitespace.
 
@@ -297,29 +301,27 @@ Token rules cannot refer to nonterminal rules. But they can refer to
 each other, as long as the references don't form a non-tail recursive
 loop. I.e. a rule `x` can not, directly or indirectly, include a
 reference to `x`, unless that reference appears at the very end of the
-rule. References to tagged token rules from inside other tokens are
-valid, but will ignore the tag—only the tag of the token rule that was
-referenced from a nonterminal will be used.
+rule.
 
 ### Skip Expressions
 
 Our initial example does not allow any whitespace between the tokens.
 Almost all real languages define some kind of special tokens, usually
 covering spacing and comments, that may occur between the other tokens
-and is ignored when matching the grammar.
+and are ignored when matching the grammar.
 
 To support whitespace, you must add a `@skip` rule to your grammar.
 
 ```
-@skip { space | comment }
+@skip { space | Comment }
 ```
 
-You could define the `space` and `comment` tokens like this:
+You could define the `space` and `Comment` tokens like this:
 
 ```
 tokens {
   space { std.whitespace+ }
-  comment:comment { "//" [^\n]* }
+  Comment { "//" ![\n]* }
   // ...
 }
 ```
@@ -328,9 +330,9 @@ A skip rule will be matched zero or more times between other tokens.
 So the rule above also handles a long sequence of comments and
 whitespace.
 
-Skipped tokens may be tagged (as `comment` is), in which case they
-will appear in the syntax tree. It is allowed for a skip expression to
-match things more complicated than single tokens.
+Skipped tokens may be capitalized (as `Comment` is), in which case
+they will appear in the syntax tree. It is allowed for a skip
+expression to match things more complicated than single tokens.
 
 When your grammar needs more than one kind of whitespace, for example
 when your strings aren't plain tokens but need their own internal
@@ -339,7 +341,7 @@ the pieces of string, you can create a skip block like this:
 
 ```
 @skip {} {
-  string:string.expression {
+  String {
     stringOpen (stringEscape | stringContent)* stringClose
   }
 }
@@ -355,14 +357,14 @@ Let's go back to the binary operator rule in the example. If we define
 it like this, removing the parentheses, we get an error message.
 
 ```
-binaryExpression:binary.expression { expression ("+" | "-") expression }
+BinaryExpression { expression ("+" | "-") expression }
 ```
 
 The error says "shift/reduce conflict" at `expression "+" expression ·
 "+"`. The `·` indicates the parse position, and the parser is telling
 us that, after reading what looks like a binary expression and seeing
 another operator, it doesn't know whether to first reduce the initial
-tokens to a `binaryExpression` or to first shift the second operator
+tokens to a `BinaryExpression` or to first shift the second operator
 and leave the first for later. Basically, it doesn't know whether to
 parse `x + y + z` as `(x + y) + z` or `x + (y + z)`.
 
@@ -378,25 +380,25 @@ also for operator precedence (giving groupings involving `*`
 precedence over groupings involving `+`, for example) and various
 other issues.
 
-The way to specify precedence in Lezer is with, first, an
-`@precedence` block that enumerates the precedences you are going to
-use in the grammar, in order of precedence (highest first), and then
-inserting precedence markers at ambiguous positions.
+The way to specify precedence in Lezer is with, first, a `@precedence`
+block that enumerates the precedence names you are going to use in the
+grammar, in order of precedence (highest first), and then inserting
+precedence markers at ambiguous positions.
 
 ```
 @precedence { times @left, plus @left }
 
 @top { expression }
 
-expression { number | binaryExpression }
+expression { Number | BinaryExpression }
 
-binaryExpression:binary.expression {
+BinaryExpression {
   expression !times "*" expression |
   expression !plus "+" expression
 }
 
 tokens {
-  number:number.expression { std.digit+ }
+  Number { std.digit+ }
 }
 ```
 
@@ -430,15 +432,15 @@ rule.
 
 @top { statement+ }
 
-statement { functionDeclaration | functionExpression }
+statement { FunctionDeclaration | FunctionExpression }
 
-functionExpression { "function" "..." }
+FunctionExpression { "function" "..." }
 
-functionDeclaration { !decl "function" "..." }
+FunctionDeclaration { !decl "function" "..." }
 ```
 
-This will parse `function...` as a `functionDeclaration`, though it
-would also match `functionExpression` (which could be used elsewhere
+This will parse `function...` as a `FunctionDeclaration`, though it
+would also match `FunctionExpression` (which could be used elsewhere
 in the grammar, if it was a real grammar).
 
 ### Allowing Ambiguity
@@ -448,21 +450,21 @@ To explicitly allow Lezer to try multiple actions at a given point,
 you can use ambiguity markers.
 
 ```
-@top { (goodStatement | badStatement)+ }
+@top { (GoodStatement | BadStatement)+ }
 
-goodStatement:good.statement { "(" goodValue ")" ";" }
+GoodStatement { "(" GoodValue ")" ";" }
 
-goodValue:good.value { "val" ~statement }
+GoodValue { "val" ~statement }
 
-badStatement:bad.statement { "(" badValue ")" "!" }
+BadStatement { "(" BadValue ")" "!" }
 
-badValue:bad.value { "val" ~statement }
+BadValue { "val" ~statement }
 ```
 
 This grammar is entirely nonsensical, but it shows the problem: in
-order to know whether to match `goodValue` or `badValue`, the parser
-has to decide whether it is parsing a `goodStatement` or a
-`badStatement`. But at the time where it has to do that, the next
+order to know whether to match `GoodValue` or `BadValue`, the parser
+has to decide whether it is parsing a `GoodStatement` or a
+`BadStatement`. But at the time where it has to do that, the next
 token is a closing parenthesis, which doesn't yet tell it what it
 needs to know.
 
@@ -501,13 +503,13 @@ When you pass arguments to a rule defined in the `@tokens` block,
 those arguments will be interpreted as if they are part of a token
 rule, even when you call it from a nonterminal rule.
 
-### Token Precedence and Specialization
+### Token Precedence
 
 By default, tokens are only allowed to overlap (match some prefix of
 each other) when they do not occur in the same place of the grammar or
 they are both _simple_ tokens, defined without use of repeat
-operators. I.e. you can have tokens `"+="` and `"+"`, but not tokens
-`"+" "="+` and `"+"`.
+operators. I.e. you can have tokens `"+"` and `"+="`, but not tokens
+`"+"` and `"+" "="+`.
 
 To explicitly specify that, in such a case, one of the tokens takes
 precedence, you can add `@precedence` declarations to your `@tokens`
@@ -515,18 +517,20 @@ block.
 
 ```
 @tokens {
-  divide { "/" }
-  comment { "//" [^\n]* }
-  @precedence { comment, divide }
+  Divide { "/" }
+  Comment { "//" ![\n]* }
+  @precedence { Comment, Divide }
 }
 ```
 
-By default, since `divide` is a prefix of `comment`, these would be
-considered overlapping. The `precedence` declaration states that
-`comment` overrides `divide` when both match. You can have multiple
+By default, since `Divide` is a prefix of `Comment`, these would be
+considered overlapping. The `@precedence` declaration states that
+`Comment` overrides `Divide` when both match. You can have multiple
 `@precedence` declarations in your `@tokens` block, and each
 declaration can contain any number of tokens, breaking ties between
 those tokens.
+
+### Token Specialization
 
 You could try to handle things like keywords, which overlap with
 identifiers, by specifying that they take precedence. But this is
@@ -547,22 +551,10 @@ content matches a specialization, it is replaced by the specialized
 token.
 
 ```
-newExpression:new.expression { @specialize<identifier, "new"> expression }
+NewExpression { @specialize<identifier, "new"> expression }
 ```
 
-The `newExpression` rule with match things like `new Array`.
-`@specialize` takes an optional third argument, which must be a
-`:`-prefixed tag name, to assign a tag to the specialized token. It is
-often useful to define a helper rule like this to easily define
-keywords.
-
-```
-kw<word> { @specialize<identifier, word, :$word.keyword> }
-```
-
-Inside a tag, `$` can be used to insert a parameter's content into the
-tag, so that the tag for `kw<"new">` would be `new.keyword`. This only
-works if that parameter is a rule name, literal, or other tag.
+This rule will match things like `new Array`.
 
 There is another operator similar to `@specialize`, called `@extend`.
 Whereas specialized tokens _replace_ the original token, extended
@@ -571,112 +563,23 @@ when both apply. This can be useful for contextual keywords where it
 isn't clear whether they should be treated as an identifier or a
 keyword until a few tokens later.
 
-### Tags
-
-In some cases, like `functionExpression:function.expression`, the way
-tags are specified may feel a bit redundant. Why not just use the term
-name?
-
-[Tags](##tree.Tag) are an attempt to make syntax trees usable even to
-code that knows little about the grammar. Real grammars will often use
-detailed tags like `template.string.literal.expression` that are too
-cumbersome to use to refer to the rules.
-
-Tags are structured as a sequence of parts, separated by dot
-characters. These parts are roughly ordered from most to least
-specific, so `variable.declaration.statement` would count as a
-statement, a declaration statement, and a variable declaration
-statement. (I say _roughly_ because some of the information you might
-want to store in tags doesn't have an obvious hierarchical relation to
-the rest, and it is okay to just tack it onto the end in that case.)
-
-Being meticulous about assigning tags can be a great help to users of
-your grammar's output. See the tag guide (FIXME) for some guidelines.
-
-You'll usually also want to assign a tag to your `@top` rule, which
-will determine the tag assigned to the whole tree produced by the
-grammar. If you don't, it will default to `document`.
-
-Parts that aren't plain ASCII words can be escaped with double quotes
-using JSON escaping rules. It is possible for a part to have a value,
-written `lang=javascript`.
-
-It is possible to assign a tag to an expression inline, without
-explicitly wrapping it into a rule. This can be useful for tagged
-things that are used only once.
-
-```
-statement {
-  (kw<"if"> expression statement):if.statement |
-  (kw<"return"> expression):return.statement |
-  expression:expression.statement
-}
-```
-
-Such an inline tag is written with a colon and a tag after the target
-expression.
-
-The grammar syntax also supports tag literals, which are written
-simply `:my.tag`. These are only useful as arguments to operators like
-`@specialize`, or to user-defined templates that internally use them
-to assign a tag to something.
-
-# Tag declarations
-
-Literal tokens will, by default, be untagged. But it is possible to
-explicitly add tags to them with a `@tags` block.
-
-```
-@tags {
-  "(":paren.open.punctuation
-  ")":paren.close.punctuation
-  string:string.literal
-}
-```
-
-Such a block can also assign tags to named terms, as with `string`
-above, if you prefer to specify all your tags in one place.
-
-Since it is often useful to add `.punctuation` tags to a bunch of
-single-character literals, and those tags are usually the same across
-grammars, lezer-generator has a shortcut where it accepts an
-`@punctuation` declaration inside `@tags` to quickly define these
-standard punctuation names.
-
-It can be useful for syntax tree consumers, especially when they are a
-text editor, to know when a node type is delimited by a fixed pair of
-tokens, for example `"{"` and `"}"` for block nodes. For this, the
-convention is to use a `delim="{ }"` tag part (where the value of
-`delim` holds the delimiters with a space between them). If you add an
-`@infer-delim` declaration in your `@tags` block, lezer-generator
-will, for tagged rules that look like their definition contains
-matching delimiters (their first and last token contain mirrored
-bracket-type characters) automatically add a `delim` part.
-
-```
-@tags {
-  @punctuation<"()[]{},">
-  @detect-delim
-}
-```
-
 ### External Tokens
 
 The regular way to define tokens is usually enough, and the most
 convenient. But regular languages are notoriously limited in what they
 can match, so some things, like the multiple-character look-ahead
-needed to recognize the end of a comment, are terribly awkward to
-express inside the grammar. And something like JavaScript's automatic
+needed to recognize the end of a comment, are awkward to express
+inside the grammar. And something like JavaScript's automatic
 semicolon insertion, which requires checking the content of preceding
-whitespace and looking at the character ahead, is just impossible to
-express like that.
+whitespace and looking at the character ahead, can't be expressed in
+the grammar at all.
 
 Thus, Lezer allows you to declare some tokens as being external, read
 by pieces of JavaScript code that you provide. An external tokenizer
 might look like this:
 
 ```
-@external-tokens insertSemicolon from "./tokens" { insertedSemicolon }
+@external tokens insertSemicolon from "./tokens" { insertedSemicolon }
 ```
 
 This tells lezer-generator that it should import the `insertSemicolon`
@@ -688,13 +591,95 @@ Such a tokenizer should be an
 only be called when the current state allows one of the tokens it
 defines to be matched.
 
-The order in which `external tokens` declarations and the `tokens`
+The order in which `@external tokens` declarations and the `@tokens`
 block appear in the grammar file is significant. Those that appear
 earlier will take precedence over those that appear later, meaning
 that if they return a token, the others will not be tried.
 
-You can assign tags to external tokens by writing a colon after their
-name in the `@external-tokens` block.
+### Inline Rules
+
+Rules that are only going to be used once may be written entirely
+inside the rule that uses them. This is mostly useful to declare node
+names for sub-expressions. For example this definition of a statement
+rule (which itself does not create a tree node) gives names to each of
+its choices.
+
+```
+statement {
+  ReturnStatement { Return expression } |
+  IfStatement { If expression statement } |
+  ExpressionStatement { expression ";" }
+}
+```
+
+### Node Props
+
+It is possible to add [node props](##tree.NodeProp), extra metadata
+associated with tree nodes, directly in a grammar file. To do so, you
+write square brackets after the rule's name.
+
+```
+ParenthesizedExpression[delim="( )"] { "(" expression ")" }
+```
+
+This will add the [`NodeProp.delim`](##tree.NodeProp.delim) prop to
+this node type, which provides information about the delimiters
+wrapping a node. Values that consist of only letters can be written
+without quotes, values like the one above must be quoted.
+
+Most of the props defined as static properties of
+[`NodeProp`](##tree.NodeProp) are available by default. You can also
+import custom props using syntax like this:
+
+```
+@external prop myProp from "./props"
+
+SomeRule[myProp=somevalue] { "ok" }
+```
+
+You can write `as otherName` after the prop name to rename it locally.
+
+Inline rules, external token names, and `@specialize`/`@extend`
+operators also allow square bracket prop notation to add props to the
+nodes they define.
+
+When `name` is specified in square brackets, it sets the node's name
+instead of a prop. So this rule would produce a node named `x` despite
+being itself called `y`. When a name is explicitly specified like
+this, the fact that it isn't capitalized isn't relevant.
+
+```
+y[name=x] { "y" }
+```
+
+Sometimes it is useful to insert the value of a rule parameter into a
+prop. You can use curly braces inside a prop value to splice in the
+content of an identifier or literal argument expression. This keyword
+helper rule produces a specialized token named after the keyword:
+
+```
+kw<word> { @specialize[name={word}]<identifier, word> }
+```
+
+If you put a `@detectDelim` directive in your grammar file, the parser
+generator will automatically detect rule delimiter tokens, and create
+[`delim`](##tree.NodeProp.delim) props for rules where it finds them.
+
+# Literal Token Declarations
+
+Literal tokens will, by default, not create a node. But it is possible
+to explicitly list those that you want in the tree in the tokens
+block, optionally with props.
+
+```
+@tokens {
+  "("
+  ")"
+  "#"[someProp=ok]
+
+  // ... other token rules
+}
+```
 
 ### Nested Grammars
 
@@ -702,7 +687,7 @@ Similar to external tokenizers, it is possible to pull in an external
 grammar to use it to parse bits of the input.
 
 ```
-@external-grammar parser as javascript from "lezer-javascript"
+@external grammar parser as javascript from "lezer-javascript"
 
 scriptBlock { "{{" nest.javascript "}}" }
 ```
@@ -713,9 +698,9 @@ text in between using the `parser` export from `"lezer-javascript"`.
 
 You can leave off the `as` part when the local name for the grammar,
 the thing you write after `nest`, is the same as the exported name. It
-is also possible to leave off the `from` part, in which case the
-content of the block will simply not be parsed, unless a parser for
-`javascript` is later registered with the
+is also possible to write `empty` instead of `from "..."`, in which
+case the content of the block will simply not be parsed, unless a
+parser for `javascript` is later registered with the
 [`withNested`](##lezer.Parser.withNested) method.
 
 The value of a [nested grammar](##lezer.NestedGrammar) can be either
@@ -756,12 +741,14 @@ files specified in [external token](#external-tokens) or [nested
 grammar](#nested-grammars) declarations. It exports a binding `parser`
 that holds a [`Parser`](##lezer.Parser) instance.
 
-The terms file contains, for every named term in the grammar, an
-export with the same name as the term that holds the term's ID. When
-you define an external tokenizer, you'll usually need to import the
-token IDs for the tokens you want to recognize from this file. (Since
-there'll be a _lot_ of definitions in the file for regular-sized
-grammars, you might want to use a
+The terms file contains, for every external token and every rule that
+either is a tree node and doesn't have parameters, or has the keyword
+`@export` in front of it, an export with the same name as the term
+that holds the term's ID. When you define an external tokenizer,
+you'll usually need to import the token IDs for the tokens you want to
+recognize from this file. (Since there'll be quite a lot of
+definitions in the file for regular-sized grammars, you might want to
+use a
 [tree-shaking](https://medium.com/@Rich_Harris/tree-shaking-versus-dead-code-elimination-d3765df85c80)
 bundler to remove the ones you do not need.)
 
