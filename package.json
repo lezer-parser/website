@@ -1,7 +1,7 @@
 {
   "name": "lezer-website",
   "version": "0.0.1",
-  "description": "The lezer parser system website\"",
+  "description": "The lezer parser system website",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lezer-parser/website.git"
