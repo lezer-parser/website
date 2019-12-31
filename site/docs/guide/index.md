@@ -901,7 +901,7 @@ in, and should be used by the tokenizer to decide where to start
 reading. When it recognizes a token, it should set the
 [`value`](##lezer.Token.value) (token term ID) and
 [`end`](##lezer.Token.end) (end offset) properties (possibly by using
-the [`accept` method](##lezer.Token.accept).
+the [`accept` method](##lezer.Token.accept)).
 
 ## Working with Trees
 
