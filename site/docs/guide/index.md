@@ -806,7 +806,7 @@ abstracts access to a string-like data structure. You may simply pass
 a string to [`parse`](##lezer.Parser.parse), in which case the library
 will do the wrapping itself, but if you have your data in some kind of
 data structure more involved than a string, you'll need to write your
-own class the implements [`InputStream`](##lezer.InputStream), so that
+own class that implements [`InputStream`](##lezer.InputStream), so that
 Lezer can read directly from your data structure, without copying its
 content into a flat string.
 
@@ -876,7 +876,7 @@ be called for the node itself.
 
 Finally, if they return any other value, the iteration is immediately
 stopped and that value is returned from `iterate`. This can be used
-for seach-like iteration, where you want to find a given node or check
+for search-like iteration, where you want to find a given node or check
 whether some type of node is present.
 
 ```
