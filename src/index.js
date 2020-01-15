@@ -4,6 +4,7 @@ const {join} = require("path")
 const {readFileSync, readdirSync} = require("fs")
 const {mapDir} = require("./mapdir")
 const {buildRef, linkRef} = require("./buildref")
+const {buildChangelog} = require("./changelog")
 
 let base = join(__dirname, "..")
 
@@ -30,6 +31,8 @@ let mold = loadTemplates(join(base, "template"), {})
 mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
   if (name == "docs/ref/index.html") {
     return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})}
+  } else if (name == "docs/changelog/index.md") {
+    return {content: mold.defs.page({content: buildChangelog(), fileName: name}), name: name.replace(/\.md$/, ".html")}
   } else if (/\.md$/.test(name)) {
     let text = readFileSync(fullPath, "utf8")
     let meta = /^!(\{[^]*?\})\n\n/.exec(text)

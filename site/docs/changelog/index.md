@@ -1,1 +1,1 @@
-FIXME To be added
+(Implemented in src/index.js)
