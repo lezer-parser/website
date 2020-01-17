@@ -226,7 +226,9 @@ expressions are required, or it would complain about ambiguity.
 
 `@top` defines the entry point to the grammar. This is the rule that
 will be used to match the entire input. It'll usually contain
-something that repeats, like `statement+`.
+something that repeats, like `statement+`. You can give your top node
+a name by putting the node name after `@top` (as in `@top Document
+{...}`).
 
 You'll notice that the example has some terms starting with lowercase
 letter, and some that are capitalized. This difference is significant.
