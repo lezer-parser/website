@@ -667,7 +667,7 @@ If you put a `@detectDelim` directive in your grammar file, the parser
 generator will automatically detect rule delimiter tokens, and create
 [`delim`](##tree.NodeProp.delim) props for rules where it finds them.
 
-# Literal Token Declarations
+### Literal Token Declarations
 
 Literal tokens will, by default, not create a node. But it is possible
 to explicitly list those that you want in the tree in the tokens
