@@ -885,8 +885,10 @@ for search-like iteration, where you want to find a given node or check
 whether some type of node is present.
 
 ```
-let hasBreakStatement = tree.iterate(0, tree.length, type => {
-  return type.name == "BreakStatement" ? true : undefined
+let hasBreakStatement = tree.iterate({
+  enter: type => {
+    return type.name == "BreakStatement" ? true : undefined
+  }
 })
 ```
 
