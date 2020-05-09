@@ -321,7 +321,7 @@ To support whitespace, you must add a `@skip` rule to your grammar.
 You could define the `space` and `Comment` tokens like this:
 
 ```
-tokens {
+@tokens {
   space { std.whitespace+ }
   Comment { "//" ![\n]* }
   // ...
@@ -399,7 +399,7 @@ BinaryExpression {
   expression !plus "+" expression
 }
 
-tokens {
+@tokens {
   Number { std.digit+ }
 }
 ```
