@@ -639,11 +639,11 @@ associated with tree nodes, directly in a grammar file. To do so, you
 write square brackets after the rule's name.
 
 ```
-ParenthesizedExpression[delim="( )"] { "(" expression ")" }
+StartTag[closedBy="EndTag"] { "<" }
 ```
 
-This will add the [`NodeProp.delim`](##tree.NodeProp.delim) prop to
-this node type, which provides information about the delimiters
+This will add the [`NodeProp.closedBy`](##tree.NodeProp^closedBy) prop
+to this node type, which provides information about the delimiters
 wrapping a node. Values that consist of only letters can be written
 without quotes, values like the one above must be quoted.
 
