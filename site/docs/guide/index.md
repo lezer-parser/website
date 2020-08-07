@@ -598,6 +598,24 @@ block appear in the grammar file is significant. Those that appear
 earlier will take precedence over those that appear later, meaning
 that if they return a token, the others will not be tried.
 
+It is also possible define external
+[specialization](#token-specialization) logic. With a directive like
+this, the given function (`specializeIdent`) will be called every time
+an `identifier` token is read, and can return either a replacement
+token or -1 to indicate that it doesn't specialize that value.
+
+```
+@external specialize {identifier} specializeIdent from "./tokens" {
+  keyword1,
+  keyword2
+}
+```
+
+The tokens listed between the set of braces at the end provide the
+tokens that the specializer might return. You can also write `extend`
+instead of `specialize` to make this an extending specializer, where
+both the original token and the specialized one are tried.
+
 ### Inline Rules
 
 Rules that are only going to be used once may be written entirely
@@ -718,6 +736,48 @@ sometimes that isn't what you want. A second argument may provide a
 default expression to parse, instead of entering the nested grammar,
 in case the nested grammar is a dynamic function and it returns
 `{stay: true}` (declines to enter the nesting).
+
+## Dialects
+
+Sometimes it makes sense to define several similar languages in a
+single grammar, so that they can share code and be loaded as a single
+serialized parser. When doing that, you need a way to make parts of
+the grammar conditional, so that they can be turned on or off
+depending on which language you are parsing.
+
+Lezer has a _dialect_ feature that is meant to help with this. It
+allows you to make some tokens conditional on the dialect that's
+[selected](##lezer.ParseOptions.dialect). It is used like this:
+
+```
+@dialects { comments }
+
+@top { Word+ }
+
+@skip { space | Comment }
+
+@tokens {
+  Comment[dialect=comments] { "//" ![\n]* }
+  Word { std.asciiLetter+ }
+}
+```
+
+A `@dialects` declaration provides the list of dialects supported by
+the grammar. Individual tokens (as well as tokens produced by
+specializing another tokens) can be annotated with a `dialect`
+pseudo-prop to indicate that they can only occur when that dialect is
+active. Multiple dialects may be active at once.
+
+External [tokenizers](#external-tokens) and specializers can access
+the active dialects through the
+[`Stack.dialectEnabled`](##lezer.Stack.dialectEnabled) method, using
+the dialect IDs exported from the [terms file](#building-a-grammar) as
+`Dialect_[name]` (for example
+`stack.dialectEnabled(Dialect_comments)`), and base the decision on
+whether to return a given token on that. This can also be useful when
+you need to perform more complicated tests against dialects (such as
+only return a token when a dialect is _not_ active, or when multiple
+dialects are active).
 
 ## Building a Grammar
 
