@@ -764,7 +764,7 @@ allows you to make some tokens conditional on the dialect that's
 
 A `@dialects` declaration provides the list of dialects supported by
 the grammar. Individual tokens (as well as tokens produced by
-specializing another tokens) can be annotated with a `dialect`
+specializing other tokens) can be annotated with a `dialect`
 pseudo-prop to indicate that they can only occur when that dialect is
 active. Multiple dialects may be active at once.
 
