@@ -737,7 +737,7 @@ default expression to parse, instead of entering the nested grammar,
 in case the nested grammar is a dynamic function and it returns
 `{stay: true}` (declines to enter the nesting).
 
-## Dialects
+### Dialects
 
 Sometimes it makes sense to define several similar languages in a
 single grammar, so that they can share code and be loaded as a single
