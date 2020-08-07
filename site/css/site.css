@@ -25,7 +25,6 @@
 
 html {
   overflow-y: scroll;
-  overflow-x: hidden;
   font-family: 'Source Sans Pro';
 }
 
@@ -35,6 +34,7 @@ body {
   background: white;
   font-size: 16px;
   position: relative;
+  overflow-x: hidden;
 }
 
 header, article, footer nav {
@@ -75,7 +75,7 @@ a.logo {
   padding-bottom: 10px;
   margin-bottom: -10px;
   letter-spacing: -1px;
-  background-image: url(/css/logo.png);
+  background-image: url(logo.png);
   background-size: 60px;
   background-position: top 2px left;
   background-repeat: no-repeat;
@@ -123,6 +123,7 @@ footer .navlinks {
 
 nav#toc {
   position: absolute;
+  box-sizing: border-box;
   top: 140px;
   right: calc(50% + 360px);
   color: #888;
@@ -271,7 +272,6 @@ ul.grid-list h3 {
   nav#toc {
     position: static;
     max-width: 720px;
-    box-sizing: border-box;
     padding: 15px 3px 0;
     width: auto;
     margin: 0 auto;

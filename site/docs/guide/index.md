@@ -1,4 +1,4 @@
-!{"type": "docs", "title": "Lezer System Guide"}
+!{"type": "docs", "title": "Lezer System Guide", "generateTOC": true}
 
 # System Guide
 

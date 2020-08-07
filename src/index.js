@@ -1,12 +1,18 @@
 const Mold = require("mold-template")
 const markdown = require("markdown-it")({html: true}).use(require("markdown-it-deflist")).use(require("markdown-it-anchor"))
-const {join} = require("path")
+const {join, dirname} = require("path")
 const {readFileSync, readdirSync} = require("fs")
 const {mapDir} = require("./mapdir")
-const {buildRef, linkRef} = require("./buildref")
+const {buildRef} = require("./buildref")
 const {buildChangelog} = require("./changelog")
 
 let base = join(__dirname, "..")
+
+let currentRoot = ""
+
+function linkRef(markdown, root) {
+  return markdown.replace(/\]\(#(#.*?)\)/g, `](${root}docs/ref/$1)`)
+}
 
 function loadTemplates(dir, env) {
   let mold = new Mold(env)
@@ -16,19 +22,42 @@ function loadTemplates(dir, env) {
   }
   mold.defs.markdown = function(options) {
     if (typeof options == "string") options = {text: options}
-    return markdown.render(linkRef(options.text))
+    return markdown.render(linkRef(options.text, currentRoot))
   }
   mold.defs.markdownFile = function(options) {
     if (typeof options == "string") options = {file: options}
     options.text = readFileSync(join(base, options.file + ".md"), "utf8")
     return mold.defs.markdown(options)
   }
+  mold.defs.root = function() {
+    return currentRoot
+  }
   return mold
 }
 
 let mold = loadTemplates(join(base, "template"), {})
 
+function extractTOC(text) {
+  let items = [], re = /\n(###?) (.*)/g, m
+  while (m = re.exec(text)) {
+    let depth = m[1].length, title = m[2], id = title.toLowerCase().replace(/\W+/g, "-")
+    let list = depth == 2 ? items : items[items.length - 1].children
+    list.push({name: title, link: "#" + id, children: []})
+  }
+  return items
+}
+
+function backToRoot(dir) {
+  let result = "./"
+  while (dir != ".") {
+    result += "../"
+    dir = dirname(dir)
+  }
+  return result
+}
+
 mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
+  currentRoot = backToRoot(dirname(name))
   if (name == "docs/ref/index.html") {
     return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})}
   } else if (name == "docs/changelog/index.md") {
@@ -39,6 +68,7 @@ mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
     let data = meta ? JSON.parse(meta[1]) : {}
     data.content = meta ? text.slice(meta[0].length) : text
     data.fileName = name
+    if (data.generateTOC) data.toc = extractTOC(data.content)
     return {name: name.replace(/\.md$/, ".html"),
             content: mold.defs[data.template || "page"](data)}
   } else if (/\.html$/.test(name)) {
