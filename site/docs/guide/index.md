@@ -69,7 +69,7 @@ grammar, recording the various states the parser can be in, and
 creating a table for each state mapping terminal symbols (tokens) to
 the action that should be taken when the parser sees that token in
 this state. If there's more than one action to take for a given token
-in a given state, the grammar can not be parsed with this algorithm.
+in a given state, the grammar cannot be parsed with this algorithm.
 Such problems are usually called “shift-reduce” or “reduce-reduce”
 conflicts. More about that in a moment.
 
@@ -137,10 +137,11 @@ method](##tree.Tree.applyChanges). The parser will, when possible,
 reuse nodes from this cache rather than re-parsing the parts of the
 document they cover.
 
-Because the syntax tree represents sequences of matches (specified in
-the grammar notation with the `+` and `*` operators) as balanced
-sub-trees, the cost of re-matching unchanged parts of the document is
-low, and you can quickly create a new tree even for a huge document.
+Because the syntax tree represents sequences of matches of repeat
+operators (specified in the grammar notation with `+` and `*`) as
+balanced sub-trees, the cost of re-matching unchanged parts of the
+document is low, and you can quickly create a new tree even for a huge
+document.
 
 This isn't bulletproof, though—even a tiny document change, if it
 changes the meaning of the stuff that comes after it, can require a
