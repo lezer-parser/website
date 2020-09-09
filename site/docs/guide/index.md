@@ -936,12 +936,15 @@ would be a crude way to convert a tree to XML:
 ```
 function treeToXML(tree) {
   let xml = ""
-  tree.iterate(0, tree.length, (type, start, end) => {
-    // Open tag on entering a node
-    xml += `<node type="${type.name}" start="${start}" end="${end}">`
-  }, () => {
-    // Close tag on exit
-    xml += `</node>`
+  tree.iterate({
+    enter: (type, start, end) => {
+      // Open tag on entering a node
+      xml += `<node type="${type.name}" start="${start}" end="${end}">`
+    },
+    leave: () => {
+      // Close tag on exit
+      xml += `</node>`
+    }
   })
   return xml
 }
@@ -963,8 +966,10 @@ for search-like iteration, where you want to find a given node or check
 whether some type of node is present.
 
 ```
-let hasBreakStatement = tree.iterate(0, tree.length, type => {
-  return type.name == "BreakStatement" ? true : undefined
+let hasBreakStatement = tree.iterate({
+  enter: type => {
+    return type.name == "BreakStatement" ? true : undefined
+  }
 })
 ```
 
