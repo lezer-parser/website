@@ -483,6 +483,26 @@ to the ambiguous position, it'll split its parse state, try both
 approaches, and then drop off one path when it sees that it fails to
 match on the next token.
 
+In cases where the grammar is truly ambiguous—which means that
+multiple parses can continue to reach the same state or the end of the
+input—it becomes hard to predict which parse Lezer will pick as the
+final parse. To tip the scales in favor of a given variant, it is
+possible to add _dynamic precedence_ for rules. This is done using
+[prop notation](#node-props) (which we'll get back to later).
+
+```
+@top { (A | B)+ }
+
+A[dynamicPrecedence=1] { "!" ~ambig }
+
+B { "!" ~ambig }
+```
+
+This will parse exclamation points as `A`, though they also match `B`,
+because that rule has a higher dynamic precedence. Such a precedence
+can have a value from -10 to 10. Negative numbers penalize branches
+that include this rule, positive numbers give it a bonus.
+
 ### Template Rules
 
 It is possible to define parameterized rules, which can help avoid
