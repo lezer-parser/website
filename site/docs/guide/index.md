@@ -914,83 +914,48 @@ in the grammar, but indicate repetitions from `+` or `*` operators in
 the grammar. These are essential for incremental parsing, but usually
 uninteresting in any other context.
 
-Secondly, chunks of small nodes are compressed together in arrays of
-16-bit numbers, with each node only encoding its type id, start
+Secondly, chunks of small nodes are stored together in compact arrays
+of 16-bit numbers, with each node only encoding its type id, start
 postion, end position, and the index at which its children end. This
-_is_ compact, but it is not a format you want to be directly
+helps save memory, but it is not a format you want to be directly
 interacting with.
 
-### Iteration
+That is why the syntax tree provides a [cursor](##tree.TreeCursor)
+abstraction that allows you to move though it without dealing with the
+intricacies of its data structures. You can create a cursor into a
+tree by calling its [`cursor`](##tree.Tree.cursor) method, optionally
+providing a position that the cursor should move to.
 
-The easiest thing you can do with a tree is to iterate over its (real,
-non-repeat) nodes. The [`iterate` method](##tree.Subtree.iterate) can
-do either a forward or a backward walk over a part of the tree,
-calling a function every time it enters a node, and, optionally,
-another every time it exits a node.
+Such cursors are always focused on a node, and will tell you its
+[type](##tree.TreeCursor.type) and
+[position](##tree.TreeCursor.start). From that node, you can move in
+various directions. Somewhat like with a DOM node, you can move a
+cursor up to its [parent](##tree.TreeCursor.parent), down to its
+[first](##tree.TreeCursor.firstChild) or [last
+child](##tree.TreeCursor.lastChild), or to a
+[sibling](##tree.TreeCursor.nextSibling).
 
-These functions are passed the node type as well as its start and end
-positions. You can use this, possibly along with some local state
-tracking, to perform actions on the tree's content. For example, this
-would be a crude way to convert a tree to XML:
+These motion methods will, if the motion is possible, update the
+cursor and return true. When they return false, there is no node in
+the requested direction, and the cursor state will not have changed.
 
-```
-function treeToXML(tree) {
-  let xml = ""
-  tree.iterate({
-    enter: (type, start, end) => {
-      // Open tag on entering a node
-      xml += `<node type="${type.name}" start="${start}" end="${end}">`
-    },
-    leave: () => {
-      // Close tag on exit
-      xml += `</node>`
-    }
-  })
-  return xml
-}
-```
+By combining these motions, you can move through the tree in various
+ways. The cursors have [`next`](##tree.TreeCursor.next) and
+[`prev`](##tree.TreeCursor.prev) helper methods that implement full
+pre-order traversal. So you could do something like this to inspect
+every node in a tree:
 
-Iteration will include all nodes that touch the given range, even when
-they end at its start or start at its end.
-
-The function called when entering a node has a somewhat complicated
-return protocol. By default, when it returns undefined, iteration
-proceeds as normal. When it returns the precise value `false`, that
-indicates that the node that's being entered should be skipped—no
-callbacks will be called for its children, and no leave callback will
-be called for the node itself.
-
-Finally, if they return any other value, the iteration is immediately
-stopped and that value is returned from `iterate`. This can be used
-for search-like iteration, where you want to find a given node or check
-whether some type of node is present.
-
-```
-let hasBreakStatement = tree.iterate({
-  enter: type => {
-    return type.name == "BreakStatement" ? true : undefined
-  }
-})
+```javascript
+let cursor = tree.cursor()
+do {
+  console.log(`Node ${cursor.name} from ${cursor.from} to ${cursor.to}`)
+} while (cursor.next())
 ```
 
-### Subtree Cursors
-
-To rummage through a tree in a less one-directional way, you can use
-the [`Subtree`](##tree.Subtree) abstraction. This is a representation
-of a given node in the tree, with awareness of its parents and
-absolute position. It allows you to zoom in on a given node, inspect
-it, continue to its children, or go back to its parent.
-
-The top-level tree you get from the parser implements the `Subtree`
-interface. From any subtree you can use the
-[`resolve`](##tree.Subtree.resolve) method to find the innermost node
-at a given position, returned as a `Subtree`.
-
-Each subtree has a [`parent`](##tree.Subtree.parent) pointer, which
-points at the subtree for its parent node (if any).
-
-To query direct children, subtrees have
-[`firstChild`](##tree.Subtree.firstChild),
-[`lastChild`](##tree.Subtree.lastChild),
-[`childBefore`](##tree.Subtree.childBefore), and
-[`childAfter`](##tree.Subtree.childAfter) properties.
+Note that unlike [JavaScript
+iterators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol),
+on which you have to call `next` to get their first value, tree
+cursors start out already pointing at the first value (they always
+point at a node, there is no special start state), so they are a bit
+more awkward to put in a `for` loop, and fit better with `do`/`while`
+loops or loops with an `if (!cur.next()) break` at the end.
