@@ -493,7 +493,7 @@ possible to add _dynamic precedence_ for rules. This is done using
 ```
 @top { (A | B)+ }
 
-A[dynamicPrecedence=1] { "!" ~ambig }
+A[@dynamicPrecedence=1] { "!" ~ambig }
 
 B { "!" ~ambig }
 ```
@@ -684,13 +684,17 @@ Inline rules, external token names, and `@specialize`/`@extend`
 operators also allow square bracket prop notation to add props to the
 nodes they define.
 
-When `name` is specified in square brackets, it sets the node's name
-instead of a prop. So this rule would produce a node named `x` despite
-being itself called `y`. When a name is explicitly specified like
-this, the fact that it isn't capitalized isn't relevant.
+Pseudo-props, which are names that start with `@`, when they occur
+between square brackets, are used to activate and configure various
+types of additional functionality.
+
+For example, `@name` can be used to set the node's name. This rule
+would produce a node named `x` despite being itself called `y`. When a
+name is explicitly specified like this, the fact that it isn't
+capitalized isn't relevant.
 
 ```
-y[name=x] { "y" }
+y[@name=x] { "y" }
 ```
 
 Sometimes it is useful to insert the value of a rule parameter into a
@@ -699,12 +703,13 @@ content of an identifier or literal argument expression. This keyword
 helper rule produces a specialized token named after the keyword:
 
 ```
-kw<word> { @specialize[name={word}]<identifier, word> }
+kw<word> { @specialize[@name={word}]<identifier, word> }
 ```
 
-If you put a `@detectDelim` directive in your grammar file, the parser
-generator will automatically detect rule delimiter tokens, and create
-[`delim`](##tree.NodeProp.delim) props for rules where it finds them.
+If you put a `@detectDelim` directive at the top level of your grammar
+file, the parser generator will automatically detect rule delimiter
+tokens, and create [`delim`](##tree.NodeProp.delim) props for rules
+where it finds them.
 
 ### Literal Token Declarations
 
@@ -778,14 +783,14 @@ allows you to make some tokens conditional on the dialect that's
 @skip { space | Comment }
 
 @tokens {
-  Comment[dialect=comments] { "//" ![\n]* }
+  Comment[@dialect=comments] { "//" ![\n]* }
   Word { std.asciiLetter+ }
 }
 ```
 
 A `@dialects` declaration provides the list of dialects supported by
 the grammar. Individual tokens (as well as tokens produced by
-specializing other tokens) can be annotated with a `dialect`
+specializing other tokens) can be annotated with a `@dialect`
 pseudo-prop to indicate that they can only occur when that dialect is
 active. Multiple dialects may be active at once.
 
@@ -825,10 +830,10 @@ grammar](#nested-grammars) declarations. It exports a binding `parser`
 that holds a [`Parser`](##lezer.Parser) instance.
 
 The terms file contains, for every external token and every rule that
-either is a tree node and doesn't have parameters, or has the keyword
-`@export` in front of it, an export with the same name as the term
-that holds the term's ID. When you define an external tokenizer,
-you'll usually need to import the token IDs for the tokens you want to
+either is a tree node and doesn't have parameters, or has the
+`@export` pseudo-prop, an export with the same name as the term that
+holds the term's ID. When you define an external tokenizer, you'll
+usually need to import the token IDs for the tokens you want to
 recognize from this file. (Since there'll be quite a lot of
 definitions in the file for regular-sized grammars, you might want to
 use a
@@ -909,10 +914,10 @@ Syntax trees produced by Lezer are stored in a format that's optimized
 for compactness and efficient reuse during incremental parsing. Using
 this structure directly for other purposes can be very awkard.
 
-Firstly, the trees contain nodes that don't correspond to named rules
-in the grammar, but indicate repetitions from `+` or `*` operators in
-the grammar. These are essential for incremental parsing, but usually
-uninteresting in any other context.
+Firstly, the tree contains nodes that don't correspond to named rules
+in the grammar, but indicate repetitions from `+` or `*` operators.
+These are essential for incremental parsing, but usually uninteresting
+in any other context.
 
 Secondly, chunks of small nodes are stored together in compact arrays
 of 16-bit numbers, with each node only encoding its type id, start
@@ -920,17 +925,50 @@ postion, end position, and the index at which its children end. This
 helps save memory, but it is not a format you want to be directly
 interacting with.
 
-That is why the syntax tree provides a [cursor](##tree.TreeCursor)
-abstraction that allows you to move though it without dealing with the
-intricacies of its data structures. You can create a cursor into a
-tree by calling its [`cursor`](##tree.Tree.cursor) method, optionally
-providing a position that the cursor should move to.
+That is why syntax trees provides two abstractions to help you inspect
+their structure: [`SyntaxNode`](##tree.SyntaxNode), which is an object
+providing convenient access to a given node, its children, and its
+parent, and [`TreeCursor`](##tree.TreeCursor), which provides a
+similar service in a mutable and somewhat more efficient form, for
+bulk iteration.
+
+### Syntax Nodes
+
+Each node instance knows its node [type](##tree.SyntaxNode.type), its
+[position](##tree.SyntaxNode.from) in the tree, its
+[parent](##tree.SyntaxNode.parent) node, and its backing structure,
+which can be used to access its children. To get the top node from a
+tree, use its [`topNode`](##tree.Tree.topNode) getter.
+
+Nodes come with various getters, like
+[`nextSibling`](##tree.SyntaxNode.nextSibling) and
+[`firstChild`](##tree.SyntaxNode.firstChild), which allow you to get a
+node object for nearby nodes.
+
+You can use a tree's [`resolve`](##tree.Tree.resolve) method to get
+the inner node at, before, or after a given document position. This,
+in combination with iterating up the parent nodes of the result, is
+often useful way to figure out what syntactic constructs exists at a
+given position.
+
+### Tree Cursors
+
+Because syntax nodes allocate a new object for every node visited,
+they are very convenient for small-scale tree analysis (such as
+looking at a given position in the tree and its parent nodes), but too
+wasteful when iterating over large amounts of nodes.
+
+The [cursor](##tree.TreeCursor) abstraction allows you to move though
+the tree without dealing with the intricacies of its data structures.
+You can create a cursor into a tree by calling its
+[`cursor`](##tree.Tree.cursor) method, optionally providing a position
+that the cursor should move to.
 
 Such cursors are always focused on a node, and will tell you its
-[type](##tree.TreeCursor.type) and
-[position](##tree.TreeCursor.start). From that node, you can move in
-various directions. Somewhat like with a DOM node, you can move a
-cursor up to its [parent](##tree.TreeCursor.parent), down to its
+[type](##tree.TreeCursor.type) and [position](##tree.TreeCursor.from).
+From that node, you can move in various directions. Somewhat like with
+a DOM node, you can move a cursor up to its
+[parent](##tree.TreeCursor.parent), down to its
 [first](##tree.TreeCursor.firstChild) or [last
 child](##tree.TreeCursor.lastChild), or to a
 [sibling](##tree.TreeCursor.nextSibling).
@@ -959,3 +997,55 @@ cursors start out already pointing at the first value (they always
 point at a node, there is no special start state), so they are a bit
 more awkward to put in a `for` loop, and fit better with `do`/`while`
 loops or loops with an `if (!cur.next()) break` at the end.
+
+### Node Groups
+
+Because Lezer does not, like most parsers, organize a node's children
+(beyond the order in which they appear in the source), it can be
+difficult to find the children you are interested in.
+
+To provide at least _some_ help with this, nodes can be assigned a
+[group](##tree.NodeProp^group). If you, for example, assign all
+expression-type nodes the `Expression` group, you can find the
+elements of an array literal node by gathering all children that
+belong to that group.
+
+`SyntaxNode`s provide two methods,
+[`getChild`](##lezer.SyntaxNode.getChild) and
+[`getChildren`](##lezer.SyntaxNode.getChildren) that help with this.
+They can get the first child (or all children) that has a given node
+type or group.
+
+```javascript
+let elements = arrayNode.getChildren("Expression")
+```
+
+In addition, they allow you to specify that you are only interested in
+children that occur after, before, or between other node types. If you
+have, for example, an index expression as...
+
+```
+IndexExpression { expression "[" expression "]" }
+```
+
+Assuming that the brackets are visible in the tree, you could get the
+array and index parts through `node.getChild("Expression", null, "[")`
+and `node.getChild("Expression", "[", "]")` respectively.
+
+To make assigning groups a bit less annoying, since such groups are
+often already organized in a parent rule, for a rule where each choice
+produces only a single named node, you can use the `@isGroup`
+pseudo-prop in your grammar to add a group to all those named nodes.
+
+```
+statement[@isGroup=Statement] {
+  IfStatement |
+  ForStatement |
+  ExpressionStatement |
+  declaration
+}
+```
+
+Assuming `declaration` itself only has choices that produce a single
+named node, this'll assign all those, along with the named nodes
+directly mentioned in the rule, to the `Statement` group.
