@@ -209,7 +209,7 @@ language](https://en.wikipedia.org/wiki/Context-free_language).
 Here is an example of a simple grammar:
 
 ```
-@top { expression }
+@top Program { expression }
 
 expression { Name | Number | BinaryExpression }
 
@@ -227,9 +227,7 @@ expressions are required, or it would complain about ambiguity.
 
 `@top` defines the entry point to the grammar. This is the rule that
 will be used to match the entire input. It'll usually contain
-something that repeats, like `statement+`. You can give your top node
-a name by putting the node name after `@top` (as in `@top Document
-{...}`).
+something that repeats, like `statement+`.
 
 You'll notice that the example has some terms starting with lowercase
 letter, and some that are capitalized. This difference is significant.
@@ -391,7 +389,7 @@ precedence markers at ambiguous positions.
 ```
 @precedence { times @left, plus @left }
 
-@top { expression }
+@top Program { expression }
 
 expression { Number | BinaryExpression }
 
@@ -433,7 +431,7 @@ rule.
 ```
 @precedence { decl @cut }
 
-@top { statement+ }
+@top Program { statement+ }
 
 statement { FunctionDeclaration | FunctionExpression }
 
@@ -453,7 +451,7 @@ To explicitly allow Lezer to try multiple actions at a given point,
 you can use ambiguity markers.
 
 ```
-@top { (GoodStatement | BadStatement)+ }
+@top Program { (GoodStatement | BadStatement)+ }
 
 GoodStatement { "(" GoodValue ")" ";" }
 
@@ -491,7 +489,7 @@ possible to add _dynamic precedence_ for rules. This is done using
 [prop notation](#node-props) (which we'll get back to later).
 
 ```
-@top { (A | B)+ }
+@top Program { (A | B)+ }
 
 A[@dynamicPrecedence=1] { "!" ~ambig }
 
@@ -778,7 +776,7 @@ allows you to make some tokens conditional on the dialect that's
 ```
 @dialects { comments }
 
-@top { Word+ }
+@top Document { Word+ }
 
 @skip { space | Comment }
 
