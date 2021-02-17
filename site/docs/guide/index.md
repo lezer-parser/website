@@ -635,6 +635,18 @@ tokens that the specializer might return. You can also write `extend`
 instead of `specialize` to make this an extending specializer, where
 both the original token and the specialized one are tried.
 
+Sometimes, for example when creating “indent” and “dedent” tokens in a
+[Python parser](https://github.com/lezer-parser/python), an external
+tokenizer needs to keep some state (such as the current indentation).
+To do this, you must enable a [context
+tracker](##lezer.ContextTracker) in your grammar. This is an object
+that is notified of the actions that the parser takes, and uses those
+to maintain some context value.
+
+```
+@context trackIndent from "./helpers.js"
+```
+
 ### Inline Rules
 
 Rules that are only going to be used once may be written entirely
