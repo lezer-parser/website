@@ -55,6 +55,11 @@ system written in C and Rust, and several papers by Tim Wagner and
 Susan Graham on incremental parsing
 ([1](ftp.cs.berkeley.edu/sggs/toplas-parsing.ps),
 [2](https://www.semanticscholar.org/paper/Incremental-Analysis-of-real-Programming-Languages-Wagner-Graham/163592ac3777ee396f32318fcd83b1c563f2e496)).
+It exists as a different system because it has different priorities
+than tree-sitter—as part of a JavaScript system, it is written in
+JavaScript, with relatively small library and parser table size. It
+also generates more compact in-memory trees, to avoid putting too much
+pressure on the user's machine.
 
 ## Parser Algorithm
 
