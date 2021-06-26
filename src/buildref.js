@@ -4,29 +4,28 @@ const {join, relative} = require("path")
 
 function Mod(name) {
   this.name = name
-  this.shortName = /\w+$/.exec(name)[0]
-  let dir = require.resolve(name)
+  let dir = require.resolve("@lezer/" + name)
   this.base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
-  this.main = join(join(this.base, "src"), name == "lezer-tree" ? "tree.ts" : "index.ts")
+  this.main = join(join(this.base, "src"), "index.ts")
   this.relative = relative(process.cwd(), this.base) + "/"
 }
 
 exports.buildRef = function buildRef() {
-  let modules = ["lezer", "lezer-tree", "lezer-generator"].map(n => new Mod(n))
+  let modules = ["common", "lr", "generator"].map(n => new Mod(n))
 
-  let moduleItems = gatherMany(modules.map(mod => ({filename: mod.main})))
+  let moduleItems = gatherMany(modules.map(mod => ({filename: mod.main, basedir: mod.base})))
   return modules.map((mod, i) => {
     return {
-      name: mod.shortName,
+      name: mod.name,
       content: build({
         name: mod.name,
-        anchorPrefix: mod.shortName + ".",
+        anchorPrefix: mod.name + ".",
         main: join(mod.main, "../README.md"),
         allowUnresolvedTypes: false,
         breakAt: 45,
         imports: [type => {
           let sibling = type.typeSource && modules.find(m => type.typeSource.startsWith(m.relative))
-          if (sibling) return "#" + sibling.shortName + "." + type.type
+          if (sibling) return "#" + sibling.name + "." + type.type
         }]
       }, moduleItems[i])
     }

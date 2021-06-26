@@ -13,9 +13,9 @@
   "dependencies": {
     "builddocs": "^1.0.0",
     "getdocs-ts": "^0.1.0",
-    "lezer": "^0.13.0",
-    "lezer-generator": "^0.13.0",
-    "lezer-tree": "^0.13.0",
+    "@lezer/common": "^0.13.0",
+    "@lezer/lr": "^0.13.0",
+    "@lezer/generator": "^0.13.0",
     "markdown-it": "^9.1.0",
     "markdown-it-anchor": "^5.2.4",
     "markdown-it-deflist": "^2.0.3",

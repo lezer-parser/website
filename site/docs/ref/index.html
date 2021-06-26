@@ -1,27 +1,33 @@
 <<head {title: "Lezer Reference Manual", type: "docs"}>>
 
 <<toc [
-  {name: "lezer", link: "#lezer"},
-  {name: "lezer-tree", link: "#tree"},
-  {name: "lezer-generator", link: "#generator"}
+  {name: "common", link: "#common"},
+  {name: "lr", link: "#lr"},
+  {name: "generator", link: "#generator"}
 ] >>
 
 <h1>Reference Manual</h1>
 
-<p>The lezer system consists of three modules, each distributed as a
+<p>The lezer system consists of multiple modules, each distributed as a
 separate package on <a href="https://www.npmjs.com/">npm</a>.</p>
 
 <ul>
-  <li><a href="#lezer"><code>lezer</code></a>, the parser run-time</li>
-  <li><a href="#tree"><code>lezer-tree</code></a>, the data structure for representing syntax trees</li>
-  <li><a href="#generator"><code>lezer-generator</code></a>, the parser generator, an offline build tool to create parse tables from a grammar description</li>
+  <li><a href="#common"><code>@lezer/common</code></a>: The data structures for the syntax tree and the types shared between all parser implementations.</li>
+  <li><a href="#lr"><code>@lezer/lr</code></a>: The <a href="https://en.wikipedia.org/wiki/LR_parser">LR</a> parser runtime.</li>
+  <li><a href="#generator"><code>@lezer/generator</code></a>: The parser generator, an offline build tool to create parse tables from a grammar description.</li>
 </ul>
 
 <<for mod $in.modules>>
   <section id="<<t mod.name>>">
-    <h2><<t mod.name>> module</h2>
+    <h2><a href="#<<t mod.name>>">@lezer/<<t mod.name>> module</a></h2>
     <<h mod.content>>
   </section>
 <</for>>
+
+<script>
+  // Forward from old links to their new representation
+  var oldRef = /^#(tree|lezer)(\..*)/.exec(document.location.hash)
+  if (oldRef) document.location.hash = "#" + (oldRef[1] == "tree" ? "common" : "lr") + oldRef[2]
+</script>
 
 <<foot>>

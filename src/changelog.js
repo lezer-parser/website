@@ -1,9 +1,12 @@
 const {readFileSync} = require("fs")
 const {join} = require("path")
 
+const nameChange = "2021-06-26"
+const nameMap = {common: "lezer-tree", lr: "lezer", generator: "lezer-generator"}
+
 exports.buildChangelog = function() {
-  let logs = ["lezer", "lezer-tree", "lezer-generator"].map(mod => {
-    let dir = require.resolve(mod)
+  let logs = ["common", "lr", "generator"].map(mod => {
+    let dir = require.resolve("@lezer/" + mod)
     let base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
     return {mod, log: readFileSync(join(base, "CHANGELOG.md"), "utf8")}
   })
@@ -13,7 +16,8 @@ exports.buildChangelog = function() {
   for (let {mod, log} of logs) {
     for (let m; m = release.exec(log);) {
       let [_, version, date, body] = m
-      entries.push({date, content: `## [${mod}](../ref/#${mod}) ${version} (${date})\n${body}`})
+      let modName = date < nameChange ? nameMap[mod] : "@lezer/" + mod
+      entries.push({date, content: `## [${modName}](../ref/#${mod}) ${version} (${date})\n${body}`})
     }
   }
   return "# Version Changelog\n\n" +
