@@ -120,7 +120,7 @@ still have a fast parser.
 
 ### Error Recovery
 
-Though the parser has a [`strict`](##lr.ParseOptions.strict) mode,
+Though the parser has a [`strict`](##lr.ParserConfig.strict) mode,
 by default it'll proceed through any text, no matter how badly it fits
 the grammar, and come up with a tree at the end.
 
@@ -136,7 +136,7 @@ error node.
 ### Incremental Parsing
 
 In order to avoid re-doing work, the parser allows you to provide a
-cache of [tree fragments](##common.ParseSpec.fragments), which hold
+cache of [tree fragments](##common.Parser.startParse), which hold
 informat about trees produced by previous parses,
 [annotated](##common.TreeFragment^applyChanges) with information about
 the document changes that happened in the meantime. The parser will,
@@ -178,18 +178,6 @@ position.
 
 Even white space, the type of tokens implicitly skipped by the parser,
 is contextual, and you can have different rules skip different things.
-
-### Grammar Nesting
-
-In some cases, such as JavaScript embedded in HTML or code snippets
-inside a literal programming notation, you want to make another parser
-responsible for parsing pieces of a document. Lezer supports one form
-of this: If the nested syntax has a clearly identifiable end token,
-you can specify that anything up to that token should be parsed by
-another grammar.
-
-This means that parse trees can contain node types from different
-grammars.
 
 ## Writing a Grammar
 
@@ -744,31 +732,6 @@ block, optionally with props.
 }
 ```
 
-### Nested Grammars
-
-It is possible to set up a parser so that it will, when reducing
-certain nodes, run _another_ parser on the content of those nodes.
-This is done with the [`nested`](##lr.ParserConfig.nested) parser
-configuration option.
-
-This is useful in languages that contain content in another language
-inside of them, such as HTML with CSS and JavaScript—you can set up
-the outer parser to figure out the extent of this content, and then
-have it run another parser on that range.
-
-The option can associate certain term ids (which you can import from
-the parser's [terms file](#building-a-grammar)) with functions that
-must return another [`Parser`](##common.Parser) instance. The nodes
-that cause nesting _must_ be part of the tree (capitalized or
-explicitly given a name).
-
-After the inner parse completes, its result will be
-[mounted](##common.NodeProp^mountedTree) onto the node it replaces.
-That means its original content can still be used during incremental
-parsing by the outer parser—so if you expect these nodes to be big, it
-is worthwhile to make sure they aren't represented by a single token,
-so that they can be reparsed without scanning their entire range.
-
 ### Dialects
 
 Sometimes it makes sense to define several similar languages in a
@@ -810,6 +773,38 @@ whether to return a given token on that. This can also be useful when
 you need to perform more complicated tests against dialects (such as
 only return a token when a dialect is _not_ active, or when multiple
 dialects are active).
+
+### Grammar Nesting
+
+In some cases, such as JavaScript embedded in HTML or code snippets
+inside a literal programming notation, you want to make another parser
+responsible for parsing pieces of a document.
+
+Lezer implements this as a post-processing pass on the tree. The
+[`parseMixed`](##common.parseMixed) utility scans the tree (or the
+newly parsed parts of the tree in case of an incremental parse) for
+nodes that should have other languages embedded in them.
+
+If ranges that use another language are found, the appropriate parser
+is ran over them, and the resulting trees are attached to the main
+tree using [`NodeProp.mounted`](##common.NodeProp^mounted). There are
+two ways to mount subtrees:
+
+ - Regular mounts just replace the original node with the root of the
+   inner tree when iterating through the outer tree. This is the
+   easiest to work with, and usually preferable when the languages are
+   strictly nested. For example, the content of a `<script>` tag in an
+   HTML tree could be replaced with a JavaScript tree.
+
+ - Overlays replace just parts of the node with content from another
+   tree. This is useful when the nesting isn't strictly hierarchical,
+   such as between a templating language and its output language,
+   where both have structure, but that structure may overlap in weird
+   ways (`<p>...<?if x?></p><p>...<?/if?></p>`).
+
+   When iterating through a tree normally, overlays are ignored. But
+   you can enter them explicitly with the [`enter`
+   method](##common.SyntaxNode.enter).
 
 ## Building a Grammar
 
@@ -870,7 +865,7 @@ These are the command-line options supported by `lezer-generator`:
 ## Running the Parser
 
 The simplest way to parse a file is to call
-[`LRParser.parse`](##lr.LRParser.parse) on the parser you import from
+[`parse`](##common.Parser.parse) on the parser you import from
 the generated file. This will always succeed and return a
 [`Tree`](##common.Tree) instance.
 
@@ -879,7 +874,7 @@ happens in discrete steps, and have control over when the steps are
 performed. You can create a [parse](##common.PartialParse) object,
 represneting an in-progress parse, with the
 [`startParse`](##common.Parser.startParse) method. You then repeatedly
-call [`advance`](##lezer.PartialParse.advance) to perform the next
+call [`advance`](##common.PartialParse.advance) to perform the next
 action, until you decide you have parsed enough or the method returns
 a [tree](##common.Tree) to indicate that is has finished parsing.
 
@@ -888,11 +883,9 @@ instances, each of which represents an actual single parse state. When
 the parse is unambiguous, there'll be one stack. When it is trying out
 multiple options in parallel, there'll be more than one. You don't
 usually need to concern yourself with these, but an [external
-tokenizer](##lr.ExternalTokenizer) or nested parse [resolution
-function](##lr.NestMap) gets access to a stack and can query
-it to, for example, ask if the current state accepts a given
-[token](##lr.Stack.canShift) or where the rule that is currently
-being matched [starts](##lr.Stack.ruleStart).
+tokenizer](##lr.ExternalTokenizer) gets access to a stack and can
+query it to, for example, ask if the current state accepts a given
+[token](##lr.Stack.canShift).
 
 Parsing consumes an [`Input`](##common.Input), which abstracts access
 to a string-like data structure. You may simply pass a string to
