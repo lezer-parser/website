@@ -1,13 +1,14 @@
 const {gatherMany} = require("getdocs-ts")
 const {build} = require("builddocs")
 const {join, relative} = require("path")
+const {realpathSync} = require("fs")
 
 function Mod(name) {
   this.name = name
   let dir = require.resolve("@lezer/" + name)
   this.base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
   this.main = join(join(this.base, "src"), "index.ts")
-  this.relative = relative(process.cwd(), this.base) + "/"
+  this.path = realpathSync(relative(process.cwd(), this.base) + "/")
 }
 
 exports.buildRef = function buildRef() {
@@ -24,7 +25,7 @@ exports.buildRef = function buildRef() {
         allowUnresolvedTypes: false,
         breakAt: 45,
         imports: [type => {
-          let sibling = type.typeSource && modules.find(m => type.typeSource.startsWith(m.relative))
+          let sibling = type.typeSource && modules.find(m => realpathSync(type.typeSource).startsWith(m.path))
           if (sibling) return "#" + sibling.name + "." + type.type
         }]
       }, moduleItems[i])
