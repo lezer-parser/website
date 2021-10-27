@@ -66,7 +66,7 @@ mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
     }
     let modules = buildRef()
     for (let m of modules) {
-      m.content = m.content.replace(/<h3>([\w\s]+?)<\/h3>/g, (_, content) => {
+      m.content = m.content.replace(/<h3>([\S\s]+?)<\/h3>/g, (_, content) => {
         let id = m.name + '.' + content.replace(/\s/g, '_')
         return `<h3 id="${id}">${content}</h3>`
       })
