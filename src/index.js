@@ -67,13 +67,10 @@ mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
     let modules = buildRef()
     for (let m of modules) {
       m.content = m.content.replace(/<h3>([\S\s]+?)<\/h3>/g, (_, content) => {
-        let id = m.name + '.' + content.replace(/\s/g, '_')
+        let id = m.name + '.' + content.replace(/\W+/g, '_')
+        tocMap[m.name].children.push({name: content, link: '#' + id})
         return `<h3 id="${id}">${content}</h3>`
       })
-      let headers = m.content.matchAll(/<h3 id="(common|lr|generator).(\w+)">([\w\s]+)<\/h3>/g)
-      for (let [, mod, cls, name] of headers) {
-        tocMap[mod].children.push({name, link: '#' + mod + '.' + cls})
-      }
     }
     let toc = []
     for (let k in tocMap) toc.push(tocMap[k])
