@@ -59,7 +59,22 @@ function backToRoot(dir) {
 mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
   currentRoot = backToRoot(dirname(name))
   if (name == "docs/ref/index.html") {
-    return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules: buildRef()})}
+    let tocMap = {
+      common: {name: "common", link: "#common", children: []},
+      lr: {name: "lr", link: "#lr", children: []},
+      generator: {name: "generator", link: "#generator", children: []}
+    }
+    let modules = buildRef()
+    for (let m of modules) {
+      m.content = m.content.replace(/<h3>([\S\s]+?)<\/h3>/g, (_, content) => {
+        let id = m.name + '.' + content.replace(/\W+/g, '_')
+        tocMap[m.name].children.push({name: content, link: '#' + id})
+        return `<h3 id="${id}">${content}</h3>`
+      })
+    }
+    let toc = []
+    for (let k in tocMap) toc.push(tocMap[k])
+    return {content: mold.bake(name, readFileSync(fullPath, "utf8"))({fileName: name, modules, toc})}
   } else if (name == "docs/changelog/index.md") {
     return {content: mold.defs.page({content: buildChangelog(), fileName: name}), name: name.replace(/\.md$/, ".html")}
   } else if (/\.md$/.test(name)) {
