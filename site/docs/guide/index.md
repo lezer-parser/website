@@ -137,7 +137,7 @@ error node.
 
 In order to avoid re-doing work, the parser allows you to provide a
 cache of [tree fragments](##common.Parser.startParse), which hold
-informat about trees produced by previous parses,
+information about trees produced by previous parses,
 [annotated](##common.TreeFragment^applyChanges) with information about
 the document changes that happened in the meantime. The parser will,
 when possible, reuse nodes from this cache rather than re-parsing the
