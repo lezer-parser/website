@@ -872,7 +872,7 @@ the generated file. This will always succeed and return a
 Sometimes you want to take advantage of the fact that LR parsing
 happens in discrete steps, and have control over when the steps are
 performed. You can create a [parse](##common.PartialParse) object,
-represneting an in-progress parse, with the
+representing an in-progress parse, with the
 [`startParse`](##common.Parser.startParse) method. You then repeatedly
 call [`advance`](##common.PartialParse.advance) to perform the next
 action, until you decide you have parsed enough or the method returns
