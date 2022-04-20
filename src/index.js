@@ -62,6 +62,7 @@ mapDir(join(base, "site"), join(base, "output"), (fullPath, name) => {
     let tocMap = {
       common: {name: "common", link: "#common", children: []},
       lr: {name: "lr", link: "#lr", children: []},
+      highlight: {name: "highlight", link: "#highlight", children: []},
       generator: {name: "generator", link: "#generator", children: []}
     }
     let modules = buildRef()

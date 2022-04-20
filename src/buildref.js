@@ -7,12 +7,12 @@ function Mod(name) {
   this.name = name
   let dir = require.resolve("@lezer/" + name)
   this.base = dir.replace(/[\\\/]dist[\\\/][^\\\/]*$/, "")
-  this.main = join(join(this.base, "src"), "index.ts")
+  this.main = join(join(this.base, "src"), name == "highlight" ? "highlight.ts" : "index.ts")
   this.path = realpathSync(relative(process.cwd(), this.base) + "/")
 }
 
 exports.buildRef = function buildRef() {
-  let modules = ["common", "lr", "generator"].map(n => new Mod(n))
+  let modules = ["common", "lr", "highlight", "generator"].map(n => new Mod(n))
 
   let moduleItems = gatherMany(modules.map(mod => ({filename: mod.main, basedir: mod.base})))
   return modules.map((mod, i) => {
