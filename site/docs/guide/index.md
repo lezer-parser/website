@@ -210,8 +210,8 @@ expression { Name | Number | BinaryExpression }
 BinaryExpression { "(" expression ("+" | "-") expression ")" }
 
 @tokens {
-  Name { std.asciiLetter+ }
-  Number { std.digit+ }
+  Name { @asciiLetter+ }
+  Number { @digit+ }
 }
 ```
 
@@ -282,15 +282,16 @@ character not mentioned in the set, you write an exclamation mark
 rather than a dollar sign before the brackets. So `![x]` matches any
 character that is not `x`.
 
-The parser generator defines a few built-in character sets under names
-that start with `std.`:
+The parser generator defines a few built-in character sets which can
+be accessed with `@` notation:
 
- - `std.asciiLetter` matches `$[a-zA-Z]`
- - `std.asciiLowercase` matches `$[a-z]`
- - `std.asciiUppercase` is equivalent to `$[A-Z]`
- - `std.digit` matches `$[0-9]`
- - `std.whitespace` matches any character the Unicode standard defines
+ - `@asciiLetter` matches `$[a-zA-Z]`
+ - `@asciiLowercase` matches `$[a-z]`
+ - `@asciiUppercase` is equivalent to `$[A-Z]`
+ - `@digit` matches `$[0-9]`
+ - `@whitespace` matches any character the Unicode standard defines
    as whitespace.
+ - `@eof` matches the end of the input
 
 Token rules cannot refer to nonterminal rules. But they can refer to
 each other, as long as the references don't form a non-tail recursive
@@ -315,7 +316,7 @@ You could define the `space` and `Comment` tokens like this:
 
 ```
 @tokens {
-  space { std.whitespace+ }
+  space { @whitespace+ }
   Comment { "//" ![\n]* }
   // ...
 }
@@ -393,7 +394,7 @@ BinaryExpression {
 }
 
 @tokens {
-  Number { std.digit+ }
+  Number { @digit+ }
 }
 ```
 
@@ -753,7 +754,7 @@ allows you to make some tokens conditional on the dialect that's
 
 @tokens {
   Comment[@dialect=comments] { "//" ![\n]* }
-  Word { std.asciiLetter+ }
+  Word { @asciiLetter+ }
 }
 ```
 
