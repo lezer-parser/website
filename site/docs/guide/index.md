@@ -642,6 +642,44 @@ to maintain some context value.
 @context trackIndent from "./helpers.js"
 ```
 
+### Local Token Groups
+
+Sometimes you want to define a token type to cover all text not
+matched by other tokens. An example would be the content of a string,
+where anything not matching an escape, an interpolation, or the
+closing quote should be treated as a content token. In simple cases,
+you can write a normal Lezer token for this, but a strictly regular
+language is rather poorly suited for, and in some cases entirely
+incapable of, expressing things like “match anything up to any of
+these tokens“.
+
+Local token groups let you define a set of tokens that can be used in
+a given context (for example the content of a string or comment),
+along with a fallback token that should be used for anything else.
+
+```
+@local tokens {
+  stringEnd[@name='"'] { '"' }
+  StringEscape { "\\" _ }
+  @else stringContent
+}
+
+@skip {} {
+  String { '"' (stringContent | stringEscape)* stringEnd }
+}
+```
+
+Such a local tokenizer only works if *no* other tokens (no skip
+tokens, no literal tokens, and no tokens defined in other tokenizer
+blocks) occur in the parse states where it is used. Hence you'll
+almost always need a `@skip {}` block around the rules that use them,
+and may have to redefine tokens that already exist (like `'"'` in the
+example) in your local token block.
+
+It is possible reference rules defined in other token blocks from
+within your local token definitions to avoid duplicating the notation
+for complex tokens that are also used in other context.
+
 ### Inline Rules
 
 Rules that are only going to be used once may be written entirely
