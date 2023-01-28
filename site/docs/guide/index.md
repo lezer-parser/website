@@ -612,7 +612,7 @@ block appear in the grammar file is significant. Those that appear
 earlier will take precedence over those that appear later, meaning
 that if they return a token, the others will not be tried.
 
-It is also possible define external
+It is also possible to define external
 [specialization](#token-specialization) logic. With a directive like
 this, the given function (`specializeIdent`) will be called every time
 an `identifier` token is read, and can return either a replacement
