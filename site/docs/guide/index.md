@@ -295,7 +295,7 @@ be accessed with `@` notation:
 
 Token rules cannot refer to nonterminal rules. But they can refer to
 each other, as long as the references don't form a non-tail recursive
-loop. I.e. a rule `x` can not, directly or indirectly, include a
+loop. I.e. a rule `x` cannot, directly or indirectly, include a
 reference to `x`, unless that reference appears at the very end of the
 rule.
 
@@ -346,6 +346,14 @@ the pieces of string, you can create a skip block like this:
 The initial braces contain the skip expression—in this case we want to
 skip nothing so it is empty—and the second pair of braces contain
 rules inside of which this skip expression is used.
+
+Parse states can only have a single set of skip expressions associated
+with them (otherwise it would be unclear what to skip when in that
+state). This means that a rule with custom skip expressions like
+above, if used in another skip context, *must* be clearly delimited on
+both sides. It cannot, for example, have an optional or repeated term
+at the end, because it would be unclear what to skip at the point
+where that term may or may not follow.
 
 ### Precedence
 
@@ -441,7 +449,7 @@ in the grammar, if it was a real grammar).
 
 ### Allowing Ambiguity
 
-Still, some things can not be resolved with precedence declarations.
+Still, some things cannot be resolved with precedence declarations.
 To explicitly allow Lezer to try multiple actions at a given point,
 you can use ambiguity markers.
 
@@ -721,7 +729,7 @@ import custom props using syntax like this:
 SomeRule[myProp=somevalue] { "ok" }
 ```
 
-You can write `as otherName` after the prop name to rename it locally.
+You may write `as otherName` after the prop name to rename it locally.
 
 Inline rules, external token names, and `@specialize`/`@extend`
 operators also allow square bracket prop notation to add props to the
@@ -733,8 +741,8 @@ types of additional functionality.
 
 For example, `@name` can be used to set the node's name. This rule
 would produce a node named `x` despite being itself called `y`. When a
-name is explicitly specified like this, the fact that it isn't
-capitalized isn't relevant.
+name is explicitly specified like this, the node will be included in
+the tree regardless of whether it is capitalized.
 
 ```
 y[@name=x] { "y" }
@@ -864,10 +872,10 @@ lezer-generator lang.grammar -o lang.js
 If there are no problems with the grammar specified in `lang.grammar`,
 this will write two files, `lang.js` and `lang.terms.js`.
 
-The first is the main grammar file. It depends on `"lezer"` and on any
-files specified in [external token](#external-tokens) or [nested
-grammar](#nested-grammars) declarations. It exports a binding `parser`
-that holds an [`LRParser`](##lr.LRParser) instance.
+The first is the main grammar file. It depends on [`@lezer/lr`](##lr)
+and on any files specified in [external token](#external-tokens) or
+other external declarations. It exports a binding `parser` that holds
+an [`LRParser`](##lr.LRParser) instance.
 
 The terms file contains, for every external token and every rule that
 either is a tree node and doesn't have parameters, or has the
@@ -915,7 +923,7 @@ representing an in-progress parse, with the
 [`startParse`](##common.Parser.startParse) method. You then repeatedly
 call [`advance`](##common.PartialParse.advance) to perform the next
 action, until you decide you have parsed enough or the method returns
-a [tree](##common.Tree) to indicate that is has finished parsing.
+a [tree](##common.Tree) to indicate that it has finished parsing.
 
 Such a parse context holds a collection of [`Stack`](##lr.Stack)
 instances, each of which represents an actual single parse state. When
