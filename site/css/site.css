@@ -307,3 +307,16 @@ div.figure { margin: 1em; }
   width: 400px;
   max-width: 90%;
 }
+
+/* Code highlighting styles */
+.tok-keyword, .fn, .keyword {color: #708;}
+.tok-atom, .tok-bool {color: #219;}
+.tok-number, .prim {color: #164;}
+.tok-variableName.tok-definition, .tok-attribute {color: #30b;}
+.tok-variableName2, .tok-typeName, .type {color: #05a;}
+.tok-comment {color: #a50;}
+.tok-string, .string {color: #a11;}
+.tok-string2 {color: #f50;}
+.tok-meta {color: #555;}
+.tok-tag {color: #170;}
+.tok-invalid {color: #c00;}

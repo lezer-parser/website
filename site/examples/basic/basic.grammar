@@ -1,0 +1,33 @@
+//!top
+
+@top Program { expression* }
+
+//!expression
+
+expression {
+  Identifier |
+  String |
+  Boolean |
+  Application
+}
+
+Application { "(" expression* ")" }
+
+//!tokens
+
+@tokens {
+  Identifier { $[a-zA-Z_]+ }
+  String { '"' (!["\\] | "\\" _)* '"' }
+  Boolean { "#t" | "#f" }
+  LineComment { ";" ![\n]* }
+  space { $[ \t\n\r]+ }
+  "(" ")"
+}
+
+//!skip
+
+@skip { space | LineComment }
+
+//!delim
+
+@detectDelim

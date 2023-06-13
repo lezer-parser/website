@@ -278,7 +278,7 @@ period or a comma (there's no special meaning associated with `.` in
 this notation, or with escapes like `\s`). `$[a-z]` matches `a`, `z`,
 and any character that, in the Unicode character code ordering, comes
 between them. To create an inverted character set, matching only
-character not mentioned in the set, you write an exclamation mark
+characters not mentioned in the set, you write an exclamation mark
 rather than a dollar sign before the brackets. So `![x]` matches any
 character that is not `x`.
 
