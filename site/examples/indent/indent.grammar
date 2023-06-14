@@ -1,0 +1,46 @@
+//!element
+
+@top Tree { element* }
+
+element {
+  Atom { Identifier lineEnd } |
+  Section { Identifier lineEnd Block }
+}
+
+//!block
+
+Block { indent element+ (dedent | eof) }
+
+//!skip
+
+@skip {
+  spaces |
+  Comment |
+  blankLineStart (spaces | Comment)* lineEnd
+}
+
+//!lineEnd
+
+lineEnd { newline | eof }
+
+//!context
+
+@context trackIndent from "./tokens.js"
+
+//!externalTokens
+
+@external tokens indentation from "./tokens.js" {
+  indent
+  dedent
+  blankLineStart
+}
+
+//!tokens
+
+@tokens {
+  spaces { $[ \t]+ }
+  newline { "\n" }
+  eof { @eof }
+  Comment { "#" ![\n]+ }
+  Identifier { $[a-zA-Z0-9_]+ }
+}

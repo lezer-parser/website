@@ -638,17 +638,31 @@ tokens that the specializer might return. You can also write `extend`
 instead of `specialize` to make this an extending specializer, where
 both the original token and the specialized one are tried.
 
+### Context
+
 Sometimes, for example when creating “indent” and “dedent” tokens in a
-[Python parser](https://github.com/lezer-parser/python), an external
-tokenizer needs to keep some state (such as the current indentation).
-To do this, you must enable a [context
-tracker](##lr.ContextTracker) in your grammar. This is an object
-that is notified of the actions that the parser takes, and uses those
-to maintain some context value.
+[Python parser](https://github.com/lezer-parser/python), the parse
+needs to keep some state (such as the current indentation), and access
+that in external tokenizers.
+
+In Lezer, this is done with a context. This is a value that is kept
+alongside the parse, and updated for actions that the parser takes. It
+is written in external code as a [context
+tracker](##lr.ContextTracker), which is an object describing how to
+create and update the value. A `@context` declaration in the grammar
+enables context tracking.
 
 ```
 @context trackIndent from "./helpers.js"
 ```
+
+If the context is relevant for the validity of node reuse in
+incremental parsing (for example, you can't reuse a Python block if the
+surrounding indentation is different), it should export a
+[`hash`](##lr.ContextTracker.constructor^spec.hash) function that
+creates a numeric hash for a context value. These hashes are stored in
+the tree nodes and must match the current context for the node to be
+reused.
 
 ### Local Token Groups
 

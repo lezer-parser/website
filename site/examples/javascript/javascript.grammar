@@ -217,7 +217,7 @@ semi { ";" | insertSemi }
 
 //!noSemi
 
-@external tokens noSemicolon from "./tokens" { noSemi }
+@external tokens noSemicolon from "./tokens.js" { noSemi }
 
 //!templateStrings
 
@@ -315,7 +315,7 @@ Interpolation { InterpolationStart expression "}" }
 
 //!insertSemicolon
 
-@external tokens insertSemicolon from "./tokens" { insertSemi }
+@external tokens insertSemicolon from "./tokens.js" { insertSemi }
 
 //!detectDelim
 
