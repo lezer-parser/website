@@ -369,5 +369,8 @@ this:
 
     rollup -p @lezer/generator/rollup -e @lezer/lr javascript.grammar
 
+Or see the [setup example](../setup/) for a more general description
+of how to set up a parser project.
+
 The full JavaScript (+ TypeScript and JSX) grammar can be found [on
 GitHub](https://github.com/lezer-parser/javascript).

@@ -85,3 +85,6 @@ holding the parse tables.
 ```
 lezer-generator example.grammar > example.mjs
 ```
+
+Or see the [setup example](../setup/) for a more general description
+of how to set up a parser project.
