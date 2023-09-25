@@ -45,8 +45,6 @@ sequence of words, numbers, and quoted strings.
   Number { $[0-9]+ }
   String { '"' !["]* '"' }
 }
-
-@external propSource highlighting from "./highlight.js"
 ```
 
 Running `npm run prepare` will build the parser, leaving a file
