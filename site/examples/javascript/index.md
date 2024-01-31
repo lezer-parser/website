@@ -61,7 +61,7 @@ code like this would allow two parses, one attaching the `else` to `if
 (b)` (the correct one), and one attaching it to `if (a)` (wrong).
 
 ```javascript
-if (a) {}
+if (a)
 if (b) {}
 else {}
 ```
