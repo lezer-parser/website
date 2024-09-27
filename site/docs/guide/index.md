@@ -80,7 +80,7 @@ conflicts. More about that in a moment.
 
 When writing grammars for LR-based tools, it can help to have a rough
 feel for this algorithm. The
-[Wikipedia](https://en.wikipedia.org/wiki/Abstract_interpretation)
+[Wikipedia](https://en.wikipedia.org/wiki/LR_parser)
 article linked above is a good introduction. For a more in-depth
 treatment, I recommend Chapter 9 of [this
 book](https://dickgrune.com/Books/PTAPG_1st_Edition/BookBody.pdf)
