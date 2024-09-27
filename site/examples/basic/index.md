@@ -45,7 +45,7 @@ are only there to structure the grammar, will be left out (to keep the
 tree small and clean).
 
 Simple tokens that just match a string can be included directly in
-rules as quoted strings (for example `"("` and `")"` in `Application`.
+rules as quoted strings (for example `"("` and `")"` in `Application`).
 More involved tokens have to be defined in a `@tokens` block:
 
 !tokens
