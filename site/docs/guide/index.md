@@ -293,6 +293,8 @@ be accessed with `@` notation:
    as whitespace.
  - `@eof` matches the end of the input
 
+In addition, an underscore `_` matches any character.
+
 Token rules cannot refer to nonterminal rules. But they can refer to
 each other, as long as the references don't form a non-tail recursive
 loop. I.e. a rule `x` cannot, directly or indirectly, include a
