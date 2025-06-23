@@ -622,6 +622,11 @@ block appear in the grammar file is significant. Those that appear
 earlier will take precedence over those that appear later, meaning
 that if they return a token, the others will not be tried.
 
+If you want to make sure that a given group of external tokens is
+never used together with some specific other token, because they
+conflict, you can put a `@conflict { tokenName }` declaration in the
+external token block.
+
 It is also possible to define external
 [specialization](#token-specialization) logic. With a directive like
 this, the given function (`specializeIdent`) will be called every time
