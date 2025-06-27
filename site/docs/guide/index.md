@@ -919,6 +919,9 @@ These are the command-line options supported by `lezer-generator`:
  - `--cjs` can be used to make the tool output CommonJS modules (the
    default is to output ES modules).
 
+ - `--typeScript` makes the tool emit a TypeScript file instead of
+   plain JavaScript.
+
  - `--names` can be given to make the tool include term names in the
    output, to help debugging. This adds quite a lot of bytes to the
    output file, and should probably not be used in production.
