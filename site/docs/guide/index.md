@@ -183,7 +183,7 @@ is contextual, and you can have different rules skip different things.
 
 Lezer's [parser generator](##generator) defines its own notation for
 grammars. You can take a look at the [JavaScript
-grammar](https://github.com/lezer-parser/javascript/blob/master/src/javascript.grammar)
+grammar](https://code.haverbeke.berlin/lezer/javascript/src/branch/main/src/javascript.grammar)
 to see an example.
 
 A grammar is a collection of _rules_, which define _terms_. Terms can
@@ -648,7 +648,7 @@ both the original token and the specialized one are tried.
 ### Context
 
 Sometimes, for example when creating “indent” and “dedent” tokens in a
-[Python parser](https://github.com/lezer-parser/python), the parse
+[Python parser](https://code.haverbeke.berlin/lezer/python), the parse
 needs to keep some state (such as the current indentation), and access
 that in external tokenizers.
 

@@ -5,10 +5,10 @@
   "description": "The lezer parser system website",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lezer-parser/website.git"
+    "url": "git+https://code.haverbeke.berlin/lezer/website.git"
   },
   "bugs": {
-    "url": "https://github.com/lezer-parser/website/issues"
+    "url": "git+https://code.haverbeke.berlin/lezer/website/issues"
   },
   "homepage": "https://lezer.codemirror.net/",
   "dependencies": {

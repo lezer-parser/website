@@ -20,7 +20,7 @@ The grammar needs a bunch of precedences to define which rules take
 precedence in some cases. We'll discuss their roles when we get to the
 rules that use them. Note that our dialect already drops a bunch of
 operators in order to not get too repetitive—the
-[real](https://github.com/lezer-parser/javascript) JavaScript grammar
+[real](https://code.haverbeke.berlin/lezer/javascript) JavaScript grammar
 has 33 named precedences.
 
 !precedence
@@ -373,4 +373,4 @@ Or see the [setup example](../setup/) for a more general description
 of how to set up a parser project.
 
 The full JavaScript (+ TypeScript and JSX) grammar can be found [on
-GitHub](https://github.com/lezer-parser/javascript).
+Forgejo](https://code.haverbeke.berlin/lezer/javascript).

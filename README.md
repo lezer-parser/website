@@ -13,6 +13,6 @@ npm install
 node src/index.js
 ```
 
-This uses [getdocs-ts](https://github.com/marijnh/getdocs-ts/) and
-[builddocs](https://github.com/marijnh/builddocs/) to extract types
+This uses [getdocs-ts](https://code.haverbeke.berlin/marijn/getdocs-ts/) and
+[builddocs](https://code.haverbeke.berlin/marijn/builddocs/) to extract types
 and documentation from the project's source code.
