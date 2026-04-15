@@ -1,3 +1,5 @@
+**This repository has moved to https://code.haverbeke.berlin/lezer/website**
+
 # Lezer Website
 
 These are the sources for the [Lezer
